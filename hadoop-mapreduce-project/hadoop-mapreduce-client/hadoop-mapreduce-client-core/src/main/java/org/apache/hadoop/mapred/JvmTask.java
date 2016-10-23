@@ -50,6 +50,7 @@ public class JvmTask implements Writable {
     if (t != null) {
       out.writeBoolean(true);
       out.writeBoolean(t.isMapTask());
+      out.writeBoolean(t.conf.getBoolean("mapreduce.shuffle.use.new.impl",false));//TODO: KEYCHANGE
       t.write(out);
     } else {
       out.writeBoolean(false);
@@ -63,7 +64,12 @@ public class JvmTask implements Writable {
       if (isMap) {
         t = new MapTask();
       } else {
-        t = new ReduceTask();
+        boolean isNewShuffleImpl=in.readBoolean();
+        if(isNewShuffleImpl){
+          t = new NewReduceTask();//TODO: KEYCHANGE
+        }else{
+          t = new ReduceTask();
+        }
       }
       t.readFields(in);
     }

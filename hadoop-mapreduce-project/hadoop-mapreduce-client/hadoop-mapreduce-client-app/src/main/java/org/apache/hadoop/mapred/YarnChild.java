@@ -108,7 +108,7 @@ class YarnChild {
       taskOwner.doAs(new PrivilegedExceptionAction<TaskUmbilicalProtocol>() {
       @Override
       public TaskUmbilicalProtocol run() throws Exception {
-        return (TaskUmbilicalProtocol)RPC.getProxy(TaskUmbilicalProtocol.class,
+        return RPC.getProxy(TaskUmbilicalProtocol.class,
             TaskUmbilicalProtocol.versionID, address, job);
       }
     });
@@ -122,7 +122,7 @@ class YarnChild {
 
     try {
       int idleLoopCount = 0;
-      JvmTask myTask = null;;
+      JvmTask myTask = null;
       // poll for new task
       for (int idle = 0; null == myTask; ++idle) {
         long sleepTimeMilliSecs = Math.min(idle * 500, 1500);
@@ -220,7 +220,7 @@ class YarnChild {
   /**
    * Configure mapred-local dirs. This config is used by the task for finding
    * out an output directory.
-   * @throws IOException 
+   * @throws IOException
    */
   private static void configureLocalDirs(Task task, JobConf job) throws IOException {
     String[] localSysDirs = StringUtils.getTrimmedStrings(
@@ -262,7 +262,7 @@ class YarnChild {
   private static void configureTask(JobConf job, Task task,
       Credentials credentials, Token<JobTokenIdentifier> jt) throws IOException {
     job.setCredentials(credentials);
-    
+
     ApplicationAttemptId appAttemptId =
         ConverterUtils.toContainerId(
             System.getenv(Environment.CONTAINER_ID.name()))
