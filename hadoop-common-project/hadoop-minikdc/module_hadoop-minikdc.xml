@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_hadoop-minikdc" default="compile.module.hadoop-minikdc">
+  <dirname property="module.hadoop-minikdc.basedir" file="${ant.file.module_hadoop-minikdc}"/>
+  
+  <property name="module.jdk.home.hadoop-minikdc" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.hadoop-minikdc" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.hadoop-minikdc" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.hadoop-minikdc" value="-encoding UTF-8 -source 1.6 -target 1.6 ${compiler.args}"/>
+  
+  <property name="hadoop-minikdc.output.dir" value="${module.hadoop-minikdc.basedir}/target/classes"/>
+  <property name="hadoop-minikdc.testoutput.dir" value="${module.hadoop-minikdc.basedir}/target/test-classes"/>
+  
+  <path id="hadoop-minikdc.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="hadoop-minikdc.module.production.classpath">
+    <path refid="${module.jdk.classpath.hadoop-minikdc}"/>
+    <path refid="library.maven:_commons-io:commons-io:2.4.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-api:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.6.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-constants:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-i18n:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-i18n:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-asn1-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-client-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-codec-core:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-aci:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-util:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-model:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-util:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.mina:mina-core:2.0.0-m5.classpath"/>
+    <path refid="library.maven:_net.sf.ehcache:ehcache-core:2.4.4.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-api:1.7.5.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptor-kerberos:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-admin:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-authn:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-authz:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-changelog:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-collective:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-event:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-exception:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-journal:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-normalization:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-operational:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-referral:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-schema:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-subtree:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-trigger:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-trigger:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-kerberos-codec:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-shared:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-kerberos:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-shared:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-ldif-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-xdbm-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-mavibot-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.mavibot:mavibot:1.0.0-m1.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-avl:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-all:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_commons-pool:commons-pool:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.2.classpath"/>
+    <path refid="library.maven:_antlr:antlr:2.7.7.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-jdbm-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.jdbm:apacheds-jdbm1:bundle:2.0.0-m2.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-ldap:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-asn1-ber:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-codec-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-codec:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-sp:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_bouncycastle:bcprov-jdk15:140.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-log4j12:1.7.5.classpath"/>
+    <path refid="library.maven:_log4j:log4j:1.2.17.classpath"/>
+    <path refid="library.maven:_junit:junit:4.11.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+  </path>
+  
+  <path id="hadoop-minikdc.runtime.production.module.classpath">
+    <pathelement location="${hadoop-minikdc.output.dir}"/>
+    <path refid="library.maven:_commons-io:commons-io:2.4.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-api:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.6.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-constants:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-i18n:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-i18n:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-asn1-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-client-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-codec-core:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-aci:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-util:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-model:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-util:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.mina:mina-core:2.0.0-m5.classpath"/>
+    <path refid="library.maven:_net.sf.ehcache:ehcache-core:2.4.4.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-api:1.7.5.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptor-kerberos:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-admin:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-authn:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-authz:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-changelog:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-collective:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-event:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-exception:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-journal:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-normalization:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-operational:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-referral:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-schema:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-subtree:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-trigger:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-trigger:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-kerberos-codec:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-shared:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-kerberos:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-shared:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-ldif-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-xdbm-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-mavibot-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.mavibot:mavibot:1.0.0-m1.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-avl:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-all:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_commons-pool:commons-pool:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.2.classpath"/>
+    <path refid="library.maven:_antlr:antlr:2.7.7.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-jdbm-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.jdbm:apacheds-jdbm1:bundle:2.0.0-m2.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-ldap:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-asn1-ber:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-codec-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-codec:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-sp:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_bouncycastle:bcprov-jdk15:140.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-log4j12:1.7.5.classpath"/>
+    <path refid="library.maven:_log4j:log4j:1.2.17.classpath"/>
+    <path refid="library.maven:_junit:junit:4.11.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+  </path>
+  
+  <path id="hadoop-minikdc.module.classpath">
+    <path refid="${module.jdk.classpath.hadoop-minikdc}"/>
+    <pathelement location="${hadoop-minikdc.output.dir}"/>
+    <path refid="library.maven:_commons-io:commons-io:2.4.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-api:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.6.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-constants:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-i18n:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-i18n:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-asn1-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-client-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-codec-core:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-aci:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-util:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-model:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-util:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.mina:mina-core:2.0.0-m5.classpath"/>
+    <path refid="library.maven:_net.sf.ehcache:ehcache-core:2.4.4.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-api:1.7.5.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptor-kerberos:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-admin:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-authn:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-authz:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-changelog:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-collective:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-event:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-exception:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-journal:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-normalization:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-operational:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-referral:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-schema:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-subtree:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-trigger:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-trigger:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-kerberos-codec:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-shared:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-kerberos:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-shared:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-ldif-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-xdbm-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-mavibot-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.mavibot:mavibot:1.0.0-m1.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-avl:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-all:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_commons-pool:commons-pool:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.2.classpath"/>
+    <path refid="library.maven:_antlr:antlr:2.7.7.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-jdbm-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.jdbm:apacheds-jdbm1:bundle:2.0.0-m2.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-ldap:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-asn1-ber:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-codec-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-codec:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-sp:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_bouncycastle:bcprov-jdk15:140.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-log4j12:1.7.5.classpath"/>
+    <path refid="library.maven:_log4j:log4j:1.2.17.classpath"/>
+    <path refid="library.maven:_junit:junit:4.11.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+  </path>
+  
+  <path id="hadoop-minikdc.runtime.module.classpath">
+    <pathelement location="${hadoop-minikdc.testoutput.dir}"/>
+    <pathelement location="${hadoop-minikdc.output.dir}"/>
+    <path refid="library.maven:_commons-io:commons-io:2.4.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-api:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_commons-lang:commons-lang:2.6.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-constants:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-i18n:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-i18n:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-asn1-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-client-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-codec-core:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-aci:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-util:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-model:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-util:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.mina:mina-core:2.0.0-m5.classpath"/>
+    <path refid="library.maven:_net.sf.ehcache:ehcache-core:2.4.4.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-api:1.7.5.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptor-kerberos:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-admin:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-authn:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-authz:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-changelog:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-collective:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-event:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-exception:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-journal:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-normalization:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-operational:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-referral:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-schema:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-subtree:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-interceptors-trigger:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-trigger:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-kerberos-codec:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-shared:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-kerberos:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-shared:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-ldif-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-xdbm-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-mavibot-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.mavibot:mavibot:1.0.0-m1.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-core-avl:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-all:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_commons-pool:commons-pool:1.6.classpath"/>
+    <path refid="library.maven:_commons-collections:commons-collections:3.2.2.classpath"/>
+    <path refid="library.maven:_antlr:antlr:2.7.7.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-jdbm-partition:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.jdbm:apacheds-jdbm1:bundle:2.0.0-m2.classpath"/>
+    <path refid="library.maven:_org.apache.directory.server:apacheds-protocol-ldap:2.0.0-m15.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-asn1-ber:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-codec-api:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-codec:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_org.apache.directory.api:api-ldap-extras-sp:1.0.0-m20.classpath"/>
+    <path refid="library.maven:_bouncycastle:bcprov-jdk15:140.classpath"/>
+    <path refid="library.maven:_org.slf4j:slf4j-log4j12:1.7.5.classpath"/>
+    <path refid="library.maven:_log4j:log4j:1.2.17.classpath"/>
+    <path refid="library.maven:_junit:junit:4.11.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.hadoop-minikdc">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.hadoop-minikdc">
+    <patternset refid="excluded.from.module.hadoop-minikdc"/>
+  </patternset>
+  
+  <path id="hadoop-minikdc.module.sourcepath">
+    <dirset dir="${module.hadoop-minikdc.basedir}">
+      <include name="src/main/java"/>
+      <include name="src/main/resources"/>
+    </dirset>
+  </path>
+  
+  <path id="hadoop-minikdc.module.test.sourcepath">
+    <dirset dir="${module.hadoop-minikdc.basedir}">
+      <include name="src/test/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.hadoop-minikdc" depends="compile.module.hadoop-minikdc.production,compile.module.hadoop-minikdc.tests" description="Compile module hadoop-minikdc"/>
+  
+  <target name="compile.module.hadoop-minikdc.production" depends="register.custom.compilers" description="Compile module hadoop-minikdc; production classes">
+    <mkdir dir="${hadoop-minikdc.output.dir}"/>
+    <javac2 destdir="${hadoop-minikdc.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.hadoop-minikdc}/javac">
+      <compilerarg line="${compiler.args.hadoop-minikdc}"/>
+      <bootclasspath refid="hadoop-minikdc.module.bootclasspath"/>
+      <classpath refid="hadoop-minikdc.module.production.classpath"/>
+      <src refid="hadoop-minikdc.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.hadoop-minikdc"/>
+    </javac2>
+    
+    <copy todir="${hadoop-minikdc.output.dir}">
+      <fileset dir="${module.hadoop-minikdc.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+      <fileset dir="${module.hadoop-minikdc.basedir}/src/main/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.hadoop-minikdc.tests" depends="register.custom.compilers,compile.module.hadoop-minikdc.production" description="compile module hadoop-minikdc; test classes" unless="skip.tests">
+    <mkdir dir="${hadoop-minikdc.testoutput.dir}"/>
+    <javac2 destdir="${hadoop-minikdc.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.hadoop-minikdc}/javac">
+      <compilerarg line="${compiler.args.hadoop-minikdc}"/>
+      <bootclasspath refid="hadoop-minikdc.module.bootclasspath"/>
+      <classpath refid="hadoop-minikdc.module.classpath"/>
+      <src refid="hadoop-minikdc.module.test.sourcepath"/>
+      <patternset refid="excluded.from.compilation.hadoop-minikdc"/>
+    </javac2>
+    
+    <copy todir="${hadoop-minikdc.testoutput.dir}">
+      <fileset dir="${module.hadoop-minikdc.basedir}/src/test/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="clean.module.hadoop-minikdc" description="cleanup module">
+    <delete dir="${hadoop-minikdc.output.dir}"/>
+    <delete dir="${hadoop-minikdc.testoutput.dir}"/>
+  </target>
+</project>

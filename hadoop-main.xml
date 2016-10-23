@@ -1,0 +1,951 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="hadoop-main" default="all">
+  
+  
+  <property file="hadoop-main.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/*.rbc/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.tox/**"/>
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/vssver.scc/**"/>
+    <exclude name="**/vssver2.scc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.war"/>
+    <include name="*.ear"/>
+    <include name="*.apk"/>
+    <include name="*.zip"/>
+    <include name="*.swc"/>
+    <include name="*.ane"/>
+    <include name="*.egg"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+    <exclude name="**/?*.aj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.8" value="${jdk.home.1.8}/bin"/>
+  <path id="jdk.classpath.1.8">
+    <fileset dir="${jdk.home.1.8}">
+      <include name="jre/lib/plugin.jar"/>
+      <include name="jre/lib/jsse.jar"/>
+      <include name="jre/lib/javaws.jar"/>
+      <include name="jre/lib/charsets.jar"/>
+      <include name="jre/lib/jfxswt.jar"/>
+      <include name="jre/lib/management-agent.jar"/>
+      <include name="jre/lib/rt.jar"/>
+      <include name="jre/lib/resources.jar"/>
+      <include name="jre/lib/jce.jar"/>
+      <include name="jre/lib/jfr.jar"/>
+      <include name="jre/lib/deploy.jar"/>
+      <include name="jre/lib/ext/sunec.jar"/>
+      <include name="jre/lib/ext/jaccess.jar"/>
+      <include name="jre/lib/ext/cldrdata.jar"/>
+      <include name="jre/lib/ext/jfxrt.jar"/>
+      <include name="jre/lib/ext/sunpkcs11.jar"/>
+      <include name="jre/lib/ext/localedata.jar"/>
+      <include name="jre/lib/ext/nashorn.jar"/>
+      <include name="jre/lib/ext/dnsns.jar"/>
+      <include name="jre/lib/ext/zipfs.jar"/>
+      <include name="jre/lib/ext/sunjce_provider.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.1.8}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.1.8}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.1.8"/>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.maven:_antlr:antlr:2.7.7.classpath">
+    <pathelement location="${path.variable.maven_repository}/antlr/antlr/2.7.7/antlr-2.7.7.jar"/>
+  </path>
+  
+  <path id="library.maven:_aopalliance:aopalliance:1.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/aopalliance/aopalliance/1.0/aopalliance-1.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_asm:asm:3.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/asm/asm/3.2/asm-3.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_bouncycastle:bcprov-jdk15:140.classpath">
+    <pathelement location="${path.variable.maven_repository}/bouncycastle/bcprov-jdk15/140/bcprov-jdk15-140.jar"/>
+  </path>
+  
+  <path id="library.maven:_cglib:cglib:2.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/cglib/cglib/2.2/cglib-2.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.amazonaws:aws-java-sdk:1.7.4.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/amazonaws/aws-java-sdk/1.7.4/aws-java-sdk-1.7.4.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.codahale.metrics:metrics-core:3.0.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/codahale/metrics/metrics-core/3.0.1/metrics-core-3.0.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.fasterxml.jackson.core:jackson-annotations:2.2.3.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/fasterxml/jackson/core/jackson-annotations/2.2.3/jackson-annotations-2.2.3.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.fasterxml.jackson.core:jackson-core:2.2.3.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/fasterxml/jackson/core/jackson-core/2.2.3/jackson-core-2.2.3.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.fasterxml.jackson.core:jackson-databind:2.2.3.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/fasterxml/jackson/core/jackson-databind/2.2.3/jackson-databind-2.2.3.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.google.code.findbugs:jsr305:1.3.9.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.google.code.gson:gson:2.2.4.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/google/code/gson/gson/2.2.4/gson-2.2.4.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.google.guava:guava:11.0.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/google/guava/guava/11.0.2/guava-11.0.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.google.inject.extensions:guice-servlet:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/google/inject/extensions/guice-servlet/3.0/guice-servlet-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.google.inject:guice:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/google/inject/guice/3.0/guice-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.google.protobuf:protobuf-java:2.5.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/google/protobuf/protobuf-java/2.5.0/protobuf-java-2.5.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.googlecode.json-simple:json-simple:1.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/googlecode/json-simple/json-simple/1.1/json-simple-1.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.jamesmurty.utils:java-xmlbuilder:0.4.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/jamesmurty/utils/java-xmlbuilder/0.4/java-xmlbuilder-0.4.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.jcraft:jsch:0.1.42.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/jcraft/jsch/0.1.42/jsch-0.1.42.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.sun.jersey.contribs:jersey-guice:1.9.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/sun/jersey/contribs/jersey-guice/1.9/jersey-guice-1.9.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.sun.jersey.jersey-test-framework:jersey-test-framework-core:1.9.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/sun/jersey/jersey-test-framework/jersey-test-framework-core/1.9/jersey-test-framework-core-1.9.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.sun.jersey.jersey-test-framework:jersey-test-framework-grizzly2:1.9.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly2/1.9/jersey-test-framework-grizzly2-1.9.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.sun.jersey:jersey-client:1.9.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/sun/jersey/jersey-client/1.9/jersey-client-1.9.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.sun.jersey:jersey-core:1.9.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/sun/jersey/jersey-core/1.9/jersey-core-1.9.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.sun.jersey:jersey-grizzly2:1.9.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/sun/jersey/jersey-grizzly2/1.9/jersey-grizzly2-1.9.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.sun.jersey:jersey-json:1.9.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/sun/jersey/jersey-json/1.9/jersey-json-1.9.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.sun.jersey:jersey-server:1.9.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/sun/jersey/jersey-server/1.9/jersey-server-1.9.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.sun.xml.bind:jaxb-impl:2.2.3-1.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/sun/xml/bind/jaxb-impl/2.2.3-1/jaxb-impl-2.2.3-1.jar"/>
+  </path>
+  
+  <path id="library.maven:_com.thoughtworks.paranamer:paranamer:2.3.classpath">
+    <pathelement location="${path.variable.maven_repository}/com/thoughtworks/paranamer/paranamer/2.3/paranamer-2.3.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-beanutils:commons-beanutils-core:1.8.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-beanutils/commons-beanutils-core/1.8.0/commons-beanutils-core-1.8.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-beanutils:commons-beanutils:1.7.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-beanutils/commons-beanutils/1.7.0/commons-beanutils-1.7.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-cli:commons-cli:1.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-cli/commons-cli/1.2/commons-cli-1.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-codec:commons-codec:1.4.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-codec/commons-codec/1.4/commons-codec-1.4.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-collections:commons-collections:3.2.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-configuration:commons-configuration:1.6.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-configuration/commons-configuration/1.6/commons-configuration-1.6.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-daemon:commons-daemon:1.0.13.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-daemon/commons-daemon/1.0.13/commons-daemon-1.0.13.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-digester:commons-digester:1.8.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-digester/commons-digester/1.8/commons-digester-1.8.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-el:commons-el:1.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-el/commons-el/1.0/commons-el-1.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-httpclient:commons-httpclient:3.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-httpclient/commons-httpclient/3.1/commons-httpclient-3.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-io:commons-io:2.4.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-io/commons-io/2.4/commons-io-2.4.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-lang:commons-lang:2.6.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-lang/commons-lang/2.6/commons-lang-2.6.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-logging:commons-logging:1.1.3.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-logging/commons-logging/1.1.3/commons-logging-1.1.3.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-net:commons-net:3.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-net/commons-net/3.1/commons-net-3.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_commons-pool:commons-pool:1.6.classpath">
+    <pathelement location="${path.variable.maven_repository}/commons-pool/commons-pool/1.6/commons-pool-1.6.jar"/>
+  </path>
+  
+  <path id="library.maven:_io.netty:netty:3.6.2.final.classpath">
+    <pathelement location="${path.variable.maven_repository}/io/netty/netty/3.6.2.Final/netty-3.6.2.Final.jar"/>
+  </path>
+  
+  <path id="library.maven:_javax.activation:activation:1.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/javax/activation/activation/1.1/activation-1.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_javax.inject:javax.inject:1.classpath">
+    <pathelement location="${path.variable.maven_repository}/javax/inject/javax.inject/1/javax.inject-1.jar"/>
+  </path>
+  
+  <path id="library.maven:_javax.servlet.jsp:jsp-api:2.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/javax/servlet/jsp/jsp-api/2.1/jsp-api-2.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_javax.servlet:javax.servlet-api:3.0.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/javax/servlet/javax.servlet-api/3.0.1/javax.servlet-api-3.0.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_javax.servlet:servlet-api:2.5.classpath">
+    <pathelement location="${path.variable.maven_repository}/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
+  </path>
+  
+  <path id="library.maven:_javax.xml.bind:jaxb-api:2.2.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/javax/xml/bind/jaxb-api/2.2.2/jaxb-api-2.2.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_javax.xml.stream:stax-api:1.0-2.classpath">
+    <pathelement location="${path.variable.maven_repository}/javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2.jar"/>
+  </path>
+  
+  <path id="library.maven:_jdiff:jdiff:1.0.9.classpath">
+    <pathelement location="${path.variable.maven_repository}/jdiff/jdiff/1.0.9/jdiff-1.0.9.jar"/>
+  </path>
+  
+  <path id="library.maven:_jline:jline:0.9.94.classpath">
+    <pathelement location="${path.variable.maven_repository}/jline/jline/0.9.94/jline-0.9.94.jar"/>
+  </path>
+  
+  <path id="library.maven:_joda-time:joda-time:2.9.3.classpath">
+    <pathelement location="${path.variable.maven_repository}/joda-time/joda-time/2.9.3/joda-time-2.9.3.jar"/>
+  </path>
+  
+  <path id="library.maven:_junit:junit:4.11.classpath">
+    <pathelement location="${path.variable.maven_repository}/junit/junit/4.11/junit-4.11.jar"/>
+  </path>
+  
+  <path id="library.maven:_log4j:log4j:1.2.17.classpath">
+    <pathelement location="${path.variable.maven_repository}/log4j/log4j/1.2.17/log4j-1.2.17.jar"/>
+  </path>
+  
+  <path id="library.maven:_net.java.dev.jets3t:jets3t:0.9.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/net/java/dev/jets3t/jets3t/0.9.0/jets3t-0.9.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_net.sf.ehcache:ehcache-core:2.4.4.classpath">
+    <pathelement location="${path.variable.maven_repository}/net/sf/ehcache/ehcache-core/2.4.4/ehcache-core-2.4.4.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.ant:ant-launcher:1.8.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/ant/ant-launcher/1.8.1/ant-launcher-1.8.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.ant:ant:1.8.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/ant/ant/1.8.1/ant-1.8.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.avro:avro:1.7.4.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/avro/avro/1.7.4/avro-1.7.4.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.bookkeeper:bookkeeper-server:4.2.3.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/bookkeeper/bookkeeper-server/4.2.3/bookkeeper-server-4.2.3.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.commons:commons-compress:1.4.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/commons/commons-compress/1.4.1/commons-compress-1.4.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.commons:commons-math3:3.1.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/commons/commons-math3/3.1.1/commons-math3-3.1.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.commons:commons-math:2.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/commons/commons-math/2.2/commons-math-2.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.curator:curator-client:2.6.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/curator/curator-client/2.6.0/curator-client-2.6.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.curator:curator-framework:2.6.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/curator/curator-framework/2.6.0/curator-framework-2.6.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.curator:curator-recipes:2.6.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/curator/curator-recipes/2.6.0/curator-recipes-2.6.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.curator:curator-test:2.6.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/curator/curator-test/2.6.0/curator-test-2.6.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-all:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-all/1.0.0-M20/api-all-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-asn1-api:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-asn1-api/1.0.0-M20/api-asn1-api-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-asn1-ber:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-asn1-ber/1.0.0-M20/api-asn1-ber-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-i18n:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-i18n/1.0.0-M20/api-i18n-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-ldap-client-api:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-ldap-client-api/1.0.0-M20/api-ldap-client-api-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-ldap-codec-core:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-ldap-codec-core/1.0.0-M20/api-ldap-codec-core-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-ldap-extras-aci:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-ldap-extras-aci/1.0.0-M20/api-ldap-extras-aci-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-ldap-extras-codec-api:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-ldap-extras-codec-api/1.0.0-M20/api-ldap-extras-codec-api-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-ldap-extras-codec:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-ldap-extras-codec/1.0.0-M20/api-ldap-extras-codec-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-ldap-extras-sp:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-ldap-extras-sp/1.0.0-M20/api-ldap-extras-sp-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-ldap-extras-trigger:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-ldap-extras-trigger/1.0.0-M20/api-ldap-extras-trigger-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-ldap-extras-util:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-ldap-extras-util/1.0.0-M20/api-ldap-extras-util-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-ldap-model:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-ldap-model/1.0.0-M20/api-ldap-model-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.api:api-util:1.0.0-m20.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/api/api-util/1.0.0-M20/api-util-1.0.0-M20.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.jdbm:apacheds-jdbm1:bundle:2.0.0-m2.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/jdbm/apacheds-jdbm1/2.0.0-M2/apacheds-jdbm1-2.0.0-M2.bundle"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.mavibot:mavibot:1.0.0-m1.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/mavibot/mavibot/1.0.0-M1/mavibot-1.0.0-M1.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-core-api:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-core-api/2.0.0-M15/apacheds-core-api-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-core-avl:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-core-avl/2.0.0-M15/apacheds-core-avl-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-core-constants:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-core-constants/2.0.0-M15/apacheds-core-constants-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-core-shared:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-core-shared/2.0.0-M15/apacheds-core-shared-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-core:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-core/2.0.0-M15/apacheds-core-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-i18n:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-i18n/2.0.0-M15/apacheds-i18n-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptor-kerberos:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptor-kerberos/2.0.0-M15/apacheds-interceptor-kerberos-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-admin:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-admin/2.0.0-M15/apacheds-interceptors-admin-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-authn:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-authn/2.0.0-M15/apacheds-interceptors-authn-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-authz:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-authz/2.0.0-M15/apacheds-interceptors-authz-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-changelog:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-changelog/2.0.0-M15/apacheds-interceptors-changelog-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-collective:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-collective/2.0.0-M15/apacheds-interceptors-collective-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-event:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-event/2.0.0-M15/apacheds-interceptors-event-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-exception:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-exception/2.0.0-M15/apacheds-interceptors-exception-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-journal:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-journal/2.0.0-M15/apacheds-interceptors-journal-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-normalization:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-normalization/2.0.0-M15/apacheds-interceptors-normalization-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-operational:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-operational/2.0.0-M15/apacheds-interceptors-operational-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-referral:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-referral/2.0.0-M15/apacheds-interceptors-referral-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-schema:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-schema/2.0.0-M15/apacheds-interceptors-schema-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-subtree:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-subtree/2.0.0-M15/apacheds-interceptors-subtree-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-interceptors-trigger:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-interceptors-trigger/2.0.0-M15/apacheds-interceptors-trigger-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-jdbm-partition:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-jdbm-partition/2.0.0-M15/apacheds-jdbm-partition-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-kerberos-codec:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-kerberos-codec/2.0.0-M15/apacheds-kerberos-codec-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-ldif-partition:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-ldif-partition/2.0.0-M15/apacheds-ldif-partition-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-mavibot-partition:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-mavibot-partition/2.0.0-M15/apacheds-mavibot-partition-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-protocol-kerberos:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-protocol-kerberos/2.0.0-M15/apacheds-protocol-kerberos-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-protocol-ldap:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-protocol-ldap/2.0.0-M15/apacheds-protocol-ldap-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-protocol-shared:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-protocol-shared/2.0.0-M15/apacheds-protocol-shared-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.directory.server:apacheds-xdbm-partition:2.0.0-m15.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/directory/server/apacheds-xdbm-partition/2.0.0-M15/apacheds-xdbm-partition-2.0.0-M15.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.httpcomponents:httpclient:4.2.5.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/httpcomponents/httpclient/4.2.5/httpclient-4.2.5.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.httpcomponents:httpcore:4.2.5.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/httpcomponents/httpcore/4.2.5/httpcore-4.2.5.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.maven.plugin-tools:maven-plugin-annotations:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/maven/plugin-tools/maven-plugin-annotations/3.0/maven-plugin-annotations-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.maven:maven-aether-provider:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/maven/maven-aether-provider/3.0/maven-aether-provider-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.maven:maven-artifact:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/maven/maven-artifact/3.0/maven-artifact-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.maven:maven-core:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/maven/maven-core/3.0/maven-core-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.maven:maven-model-builder:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/maven/maven-model-builder/3.0/maven-model-builder-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.maven:maven-model:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/maven/maven-model/3.0/maven-model-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.maven:maven-plugin-api:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/maven/maven-plugin-api/3.0/maven-plugin-api-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.maven:maven-repository-metadata:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/maven/maven-repository-metadata/3.0/maven-repository-metadata-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.maven:maven-settings-builder:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/maven/maven-settings-builder/3.0/maven-settings-builder-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.maven:maven-settings:3.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/maven/maven-settings/3.0/maven-settings-3.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.mina:mina-core:2.0.0-m5.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/mina/mina-core/2.0.0-M5/mina-core-2.0.0-M5.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.tomcat.embed:tomcat-embed-core:7.0.55.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/tomcat/embed/tomcat-embed-core/7.0.55/tomcat-embed-core-7.0.55.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.tomcat.embed:tomcat-embed-logging-juli:7.0.55.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/tomcat/embed/tomcat-embed-logging-juli/7.0.55/tomcat-embed-logging-juli-7.0.55.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.zookeeper:zookeeper:3.4.6.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/zookeeper/zookeeper/3.4.6/zookeeper-3.4.6.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.apache.zookeeper:zookeeper:test-jar:tests:3.4.6.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/apache/zookeeper/zookeeper/3.4.6/zookeeper-3.4.6-tests.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.codehaus.jackson:jackson-core-asl:1.9.13.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.codehaus.jackson:jackson-jaxrs:1.9.13.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/codehaus/jackson/jackson-jaxrs/1.9.13/jackson-jaxrs-1.9.13.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.codehaus.jackson:jackson-mapper-asl:1.9.13.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.codehaus.jackson:jackson-xc:1.9.13.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/codehaus/jackson/jackson-xc/1.9.13/jackson-xc-1.9.13.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.codehaus.jettison:jettison:1.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.codehaus.plexus:plexus-classworlds:2.2.3.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/codehaus/plexus/plexus-classworlds/2.2.3/plexus-classworlds-2.2.3.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.codehaus.plexus:plexus-component-annotations:1.5.5.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/codehaus/plexus/plexus-component-annotations/1.5.5/plexus-component-annotations-1.5.5.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.codehaus.plexus:plexus-interpolation:1.14.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/codehaus/plexus/plexus-interpolation/1.14/plexus-interpolation-1.14.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.codehaus.plexus:plexus-utils:2.0.5.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/codehaus/plexus/plexus-utils/2.0.5/plexus-utils-2.0.5.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.fusesource.leveldbjni:leveldbjni-all:1.8.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/fusesource/leveldbjni/leveldbjni-all/1.8/leveldbjni-all-1.8.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.glassfish.external:management-api:3.0.0-b012.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/glassfish/external/management-api/3.0.0-b012/management-api-3.0.0-b012.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.glassfish.gmbal:gmbal-api-only:3.0.0-b023.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/glassfish/gmbal/gmbal-api-only/3.0.0-b023/gmbal-api-only-3.0.0-b023.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.glassfish.grizzly:grizzly-framework:2.1.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/glassfish/grizzly/grizzly-framework/2.1.2/grizzly-framework-2.1.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.glassfish.grizzly:grizzly-http-server:2.1.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/glassfish/grizzly/grizzly-http-server/2.1.2/grizzly-http-server-2.1.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.glassfish.grizzly:grizzly-http-servlet:2.1.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/glassfish/grizzly/grizzly-http-servlet/2.1.2/grizzly-http-servlet-2.1.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.glassfish.grizzly:grizzly-http:2.1.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/glassfish/grizzly/grizzly-http/2.1.2/grizzly-http-2.1.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.glassfish.grizzly:grizzly-rcm:2.1.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/glassfish/grizzly/grizzly-rcm/2.1.2/grizzly-rcm-2.1.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.glassfish:javax.servlet:3.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/glassfish/javax.servlet/3.1/javax.servlet-3.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.hsqldb:hsqldb:2.0.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/hsqldb/hsqldb/2.0.0/hsqldb-2.0.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.htrace:htrace-core:3.0.4.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/htrace/htrace-core/3.0.4/htrace-core-3.0.4.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.javassist:javassist:3.18.1-ga.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/javassist/javassist/3.18.1-GA/javassist-3.18.1-GA.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.jboss.netty:netty:3.2.4.final.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/jboss/netty/netty/3.2.4.Final/netty-3.2.4.Final.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.mockito:mockito-all:1.8.5.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/mockito/mockito-all/1.8.5/mockito-all-1.8.5.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.mortbay.jetty:jetty-util:6.1.26.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/mortbay/jetty/jetty-util/6.1.26/jetty-util-6.1.26.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.mortbay.jetty:jetty:6.1.26.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/mortbay/jetty/jetty/6.1.26/jetty-6.1.26.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.slf4j:jul-to-slf4j:1.7.5.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/slf4j/jul-to-slf4j/1.7.5/jul-to-slf4j-1.7.5.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.slf4j:slf4j-api:1.7.5.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/slf4j/slf4j-api/1.7.5/slf4j-api-1.7.5.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.slf4j:slf4j-log4j12:1.7.5.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/slf4j/slf4j-log4j12/1.7.5/slf4j-log4j12-1.7.5.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.sonatype.aether:aether-api:1.7.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/sonatype/aether/aether-api/1.7/aether-api-1.7.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.sonatype.aether:aether-impl:1.7.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/sonatype/aether/aether-impl/1.7/aether-impl-1.7.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.sonatype.aether:aether-spi:1.7.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/sonatype/aether/aether-spi/1.7/aether-spi-1.7.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.sonatype.aether:aether-util:1.7.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/sonatype/aether/aether-util/1.7/aether-util-1.7.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.sonatype.plexus:plexus-cipher:1.4.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/sonatype/plexus/plexus-cipher/1.4/plexus-cipher-1.4.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.sonatype.plexus:plexus-sec-dispatcher:1.3.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/sonatype/plexus/plexus-sec-dispatcher/1.3/plexus-sec-dispatcher-1.3.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.sonatype.sisu:sisu-guice:noaop:2.1.7.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/sonatype/sisu/sisu-guice/2.1.7/sisu-guice-2.1.7-noaop.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.sonatype.sisu:sisu-inject-bean:1.4.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/sonatype/sisu/sisu-inject-bean/1.4.2/sisu-inject-bean-1.4.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.sonatype.sisu:sisu-inject-plexus:1.4.2.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/sonatype/sisu/sisu-inject-plexus/1.4.2/sisu-inject-plexus-1.4.2.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.tukaani:xz:1.0.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/tukaani/xz/1.0/xz-1.0.jar"/>
+  </path>
+  
+  <path id="library.maven:_org.xerial.snappy:snappy-java:1.0.4.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/org/xerial/snappy/snappy-java/1.0.4.1/snappy-java-1.0.4.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_tomcat:jasper-compiler:5.5.23.classpath">
+    <pathelement location="${path.variable.maven_repository}/tomcat/jasper-compiler/5.5.23/jasper-compiler-5.5.23.jar"/>
+  </path>
+  
+  <path id="library.maven:_tomcat:jasper-runtime:5.5.23.classpath">
+    <pathelement location="${path.variable.maven_repository}/tomcat/jasper-runtime/5.5.23/jasper-runtime-5.5.23.jar"/>
+  </path>
+  
+  <path id="library.maven:_xerces:xercesimpl:2.9.1.classpath">
+    <pathelement location="${path.variable.maven_repository}/xerces/xercesImpl/2.9.1/xercesImpl-2.9.1.jar"/>
+  </path>
+  
+  <path id="library.maven:_xml-apis:xml-apis:1.3.04.classpath">
+    <pathelement location="${path.variable.maven_repository}/xml-apis/xml-apis/1.3.04/xml-apis-1.3.04.jar"/>
+  </path>
+  
+  <path id="library.maven:_xmlenc:xmlenc:0.52.classpath">
+    <pathelement location="${path.variable.maven_repository}/xmlenc/xmlenc/0.52/xmlenc-0.52.jar"/>
+  </path>
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <pathelement location="${javac2.home}/javac2.jar"/>
+    <pathelement location="${javac2.home}/jdom.jar"/>
+    <pathelement location="${javac2.home}/asm-all.jar"/>
+    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
+  
+  <!-- Modules -->
+  
+  <import file="${basedir}/hadoop-common-project/hadoop-annotations/module_hadoop-annotations.xml"/>
+  
+  <import file="${basedir}/hadoop-assemblies/module_hadoop-assemblies.xml"/>
+  
+  <import file="${basedir}/hadoop-common-project/module_hadoop-common-project.xml"/>
+  
+  <import file="${basedir}/hadoop-hdfs-project/module_hadoop-hdfs-project.xml"/>
+  
+  <import file="${basedir}/module_hadoop-main.xml"/>
+  
+  <import file="${basedir}/hadoop-maven-plugins/module_hadoop-maven-plugins.xml"/>
+  
+  <import file="${basedir}/hadoop-common-project/hadoop-minikdc/module_hadoop-minikdc.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-pipes/module_hadoop-pipes.xml"/>
+  
+  <import file="${basedir}/hadoop-project/module_hadoop-project.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/module_hadoop-tools.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/module_hadoop-yarn.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/module_hadoop-yarn-applications.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/module_hadoop-yarn-server.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-site/module_hadoop-yarn-site.xml"/>
+  
+  <import file="${basedir}/hadoop-common-project/hadoop-auth/module_hadoop-auth.xml"/>
+  
+  <import file="${basedir}/hadoop-project-dist/module_hadoop-project-dist.xml"/>
+  
+  <import file="${basedir}/hadoop-common-project/hadoop-auth-examples/module_hadoop-auth-examples.xml"/>
+  
+  <import file="${basedir}/hadoop-common-project/hadoop-common/module_hadoop-common.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-aws/module_hadoop-aws.xml"/>
+  
+  <import file="${basedir}/hadoop-common-project/hadoop-kms/module_hadoop-kms.xml"/>
+  
+  <import file="${basedir}/hadoop-common-project/hadoop-nfs/module_hadoop-nfs.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-openstack/module_hadoop-openstack.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-api/module_hadoop-yarn-api.xml"/>
+  
+  <import file="${basedir}/hadoop-hdfs-project/hadoop-hdfs/module_hadoop-hdfs.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-common/module_hadoop-yarn-common.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-ant/module_hadoop-ant.xml"/>
+  
+  <import file="${basedir}/hadoop-hdfs-project/hadoop-hdfs/src/contrib/bkjournal/module_hadoop-hdfs-bkjournal.xml"/>
+  
+  <import file="${basedir}/hadoop-hdfs-project/hadoop-hdfs-httpfs/module_hadoop-hdfs-httpfs.xml"/>
+  
+  <import file="${basedir}/hadoop-hdfs-project/hadoop-hdfs-nfs/module_hadoop-hdfs-nfs.xml"/>
+  
+  <import file="${basedir}/hadoop-mapreduce-project/module_hadoop-mapreduce.xml"/>
+  
+  <import file="${basedir}/hadoop-mapreduce-project/hadoop-mapreduce-client/module_hadoop-mapreduce-client.xml"/>
+  
+  <import file="${basedir}/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-core/module_hadoop-mapreduce-client-core.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-registry/module_hadoop-yarn-registry.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-common/module_hadoop-yarn-server-common.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-applicationhistoryservice/module_hadoop-yarn-server-applicationhistoryservice.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager/module_hadoop-yarn-server-nodemanager.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-web-proxy/module_hadoop-yarn-server-web-proxy.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-resourcemanager/module_hadoop-yarn-server-resourcemanager.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-tests/module_hadoop-yarn-server-tests.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-client/module_hadoop-yarn-client.xml"/>
+  
+  <import file="${basedir}/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-common/module_hadoop-mapreduce-client-common.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-distributedshell/module_hadoop-yarn-applications-distributedshell.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-applications/hadoop-yarn-applications-unmanaged-am-launcher/module_hadoop-yarn-applications-unmanaged-am-launcher.xml"/>
+  
+  <import file="${basedir}/hadoop-yarn-project/module_hadoop-yarn-project.xml"/>
+  
+  <import file="${basedir}/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs-plugins/module_hadoop-mapreduce-client-hs-plugins.xml"/>
+  
+  <import file="${basedir}/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-shuffle/module_hadoop-mapreduce-client-shuffle.xml"/>
+  
+  <import file="${basedir}/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-app/module_hadoop-mapreduce-client-app.xml"/>
+  
+  <import file="${basedir}/hadoop-dist/module_hadoop-dist.xml"/>
+  
+  <import file="${basedir}/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-hs/module_hadoop-mapreduce-client-hs.xml"/>
+  
+  <import file="${basedir}/hadoop-mapreduce-project/hadoop-mapreduce-client/hadoop-mapreduce-client-jobclient/module_hadoop-mapreduce-client-jobclient.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-archives/module_hadoop-archives.xml"/>
+  
+  <import file="${basedir}/hadoop-client/module_hadoop-client.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-datajoin/module_hadoop-datajoin.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-distcp/module_hadoop-distcp.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-extras/module_hadoop-extras.xml"/>
+  
+  <import file="${basedir}/hadoop-mapreduce-project/hadoop-mapreduce-examples/module_hadoop-mapreduce-examples.xml"/>
+  
+  <import file="${basedir}/hadoop-minicluster/module_hadoop-minicluster.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-rumen/module_hadoop-rumen.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-streaming/module_hadoop-streaming.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-gridmix/module_hadoop-gridmix.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-sls/module_hadoop-sls.xml"/>
+  
+  <import file="${basedir}/hadoop-tools/hadoop-tools-dist/module_hadoop-tools-dist.xml"/>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.hadoop-annotations, clean.module.hadoop-assemblies, clean.module.hadoop-common-project, clean.module.hadoop-hdfs-project, clean.module.hadoop-main, clean.module.hadoop-maven-plugins, clean.module.hadoop-minikdc, clean.module.hadoop-pipes, clean.module.hadoop-project, clean.module.hadoop-tools, clean.module.hadoop-yarn, clean.module.hadoop-yarn-applications, clean.module.hadoop-yarn-server, clean.module.hadoop-yarn-site, clean.module.hadoop-auth, clean.module.hadoop-project-dist, clean.module.hadoop-auth-examples, clean.module.hadoop-common, clean.module.hadoop-aws, clean.module.hadoop-kms, clean.module.hadoop-nfs, clean.module.hadoop-openstack, clean.module.hadoop-yarn-api, clean.module.hadoop-hdfs, clean.module.hadoop-yarn-common, clean.module.hadoop-ant, clean.module.hadoop-hdfs-bkjournal, clean.module.hadoop-hdfs-httpfs, clean.module.hadoop-hdfs-nfs, clean.module.hadoop-mapreduce, clean.module.hadoop-mapreduce-client, clean.module.hadoop-mapreduce-client-core, clean.module.hadoop-yarn-registry, clean.module.hadoop-yarn-server-common, clean.module.hadoop-yarn-server-applicationhistoryservice, clean.module.hadoop-yarn-server-nodemanager, clean.module.hadoop-yarn-server-web-proxy, clean.module.hadoop-yarn-server-resourcemanager, clean.module.hadoop-yarn-server-tests, clean.module.hadoop-yarn-client, clean.module.hadoop-mapreduce-client-common, clean.module.hadoop-yarn-applications-distributedshell, clean.module.hadoop-yarn-applications-unmanaged-am-launcher, clean.module.hadoop-yarn-project, clean.module.hadoop-mapreduce-client-hs-plugins, clean.module.hadoop-mapreduce-client-shuffle, clean.module.hadoop-mapreduce-client-app, clean.module.hadoop-dist, clean.module.hadoop-mapreduce-client-hs, clean.module.hadoop-mapreduce-client-jobclient, clean.module.hadoop-archives, clean.module.hadoop-client, clean.module.hadoop-datajoin, clean.module.hadoop-distcp, clean.module.hadoop-extras, clean.module.hadoop-mapreduce-examples, clean.module.hadoop-minicluster, clean.module.hadoop-rumen, clean.module.hadoop-streaming, clean.module.hadoop-gridmix, clean.module.hadoop-sls, clean.module.hadoop-tools-dist" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.hadoop-annotations, compile.module.hadoop-assemblies, compile.module.hadoop-common-project, compile.module.hadoop-hdfs-project, compile.module.hadoop-main, compile.module.hadoop-maven-plugins, compile.module.hadoop-minikdc, compile.module.hadoop-pipes, compile.module.hadoop-project, compile.module.hadoop-tools, compile.module.hadoop-yarn, compile.module.hadoop-yarn-applications, compile.module.hadoop-yarn-server, compile.module.hadoop-yarn-site, compile.module.hadoop-auth, compile.module.hadoop-project-dist, compile.module.hadoop-auth-examples, compile.module.hadoop-common, compile.module.hadoop-aws, compile.module.hadoop-kms, compile.module.hadoop-nfs, compile.module.hadoop-openstack, compile.module.hadoop-yarn-api, compile.module.hadoop-hdfs, compile.module.hadoop-yarn-common, compile.module.hadoop-ant, compile.module.hadoop-hdfs-bkjournal, compile.module.hadoop-hdfs-httpfs, compile.module.hadoop-hdfs-nfs, compile.module.hadoop-mapreduce, compile.module.hadoop-mapreduce-client, compile.module.hadoop-mapreduce-client-core, compile.module.hadoop-yarn-registry, compile.module.hadoop-yarn-server-common, compile.module.hadoop-yarn-server-applicationhistoryservice, compile.module.hadoop-yarn-server-nodemanager, compile.module.hadoop-yarn-server-web-proxy, compile.module.hadoop-yarn-server-resourcemanager, compile.module.hadoop-yarn-server-tests, compile.module.hadoop-yarn-client, compile.module.hadoop-mapreduce-client-common, compile.module.hadoop-yarn-applications-distributedshell, compile.module.hadoop-yarn-applications-unmanaged-am-launcher, compile.module.hadoop-yarn-project, compile.module.hadoop-mapreduce-client-hs-plugins, compile.module.hadoop-mapreduce-client-shuffle, compile.module.hadoop-mapreduce-client-app, compile.module.hadoop-dist, compile.module.hadoop-mapreduce-client-hs, compile.module.hadoop-mapreduce-client-jobclient, compile.module.hadoop-archives, compile.module.hadoop-client, compile.module.hadoop-datajoin, compile.module.hadoop-distcp, compile.module.hadoop-extras, compile.module.hadoop-mapreduce-examples, compile.module.hadoop-minicluster, compile.module.hadoop-rumen, compile.module.hadoop-streaming, compile.module.hadoop-gridmix, compile.module.hadoop-sls, compile.module.hadoop-tools-dist" description="build all modules"/>
+  
+  <target name="all" depends="build.modules" description="build all"/>
+</project>

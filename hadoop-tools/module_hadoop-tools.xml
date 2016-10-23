@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_hadoop-tools" default="compile.module.hadoop-tools">
+  <dirname property="module.hadoop-tools.basedir" file="${ant.file.module_hadoop-tools}"/>
+  
+  <property name="module.jdk.home.hadoop-tools" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.hadoop-tools" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.hadoop-tools" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.hadoop-tools" value="-encoding UTF-8 -source 1.5 -target 1.5 ${compiler.args}"/>
+  
+  <property name="hadoop-tools.output.dir" value="${module.hadoop-tools.basedir}/target/classes"/>
+  <property name="hadoop-tools.testoutput.dir" value="${module.hadoop-tools.basedir}/target/test-classes"/>
+  
+  <path id="hadoop-tools.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="hadoop-tools.module.production.classpath">
+    <path refid="${module.jdk.classpath.hadoop-tools}"/>
+  </path>
+  
+  <path id="hadoop-tools.runtime.production.module.classpath">
+    <pathelement location="${hadoop-tools.output.dir}"/>
+  </path>
+  
+  <path id="hadoop-tools.module.classpath">
+    <path refid="${module.jdk.classpath.hadoop-tools}"/>
+    <pathelement location="${hadoop-tools.output.dir}"/>
+  </path>
+  
+  <path id="hadoop-tools.runtime.module.classpath">
+    <pathelement location="${hadoop-tools.testoutput.dir}"/>
+    <pathelement location="${hadoop-tools.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.hadoop-tools">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.hadoop-tools">
+    <patternset refid="excluded.from.module.hadoop-tools"/>
+  </patternset>
+  
+  
+  <target name="compile.module.hadoop-tools" depends="compile.module.hadoop-tools.production,compile.module.hadoop-tools.tests" description="Compile module hadoop-tools"/>
+  
+  <target name="compile.module.hadoop-tools.production" depends="register.custom.compilers" description="Compile module hadoop-tools; production classes"/>
+  
+  <target name="compile.module.hadoop-tools.tests" depends="register.custom.compilers,compile.module.hadoop-tools.production" description="compile module hadoop-tools; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.hadoop-tools" description="cleanup module">
+    <delete dir="${hadoop-tools.output.dir}"/>
+    <delete dir="${hadoop-tools.testoutput.dir}"/>
+  </target>
+</project>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_hadoop-maven-plugins" default="compile.module.hadoop-maven-plugins">
+  <dirname property="module.hadoop-maven-plugins.basedir" file="${ant.file.module_hadoop-maven-plugins}"/>
+  
+  <property name="module.jdk.home.hadoop-maven-plugins" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.hadoop-maven-plugins" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.hadoop-maven-plugins" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.hadoop-maven-plugins" value="-encoding UTF-8 -source 1.6 -target 1.6 ${compiler.args}"/>
+  
+  <property name="hadoop-maven-plugins.output.dir" value="${module.hadoop-maven-plugins.basedir}/target/classes"/>
+  <property name="hadoop-maven-plugins.testoutput.dir" value="${module.hadoop-maven-plugins.basedir}/target/test-classes"/>
+  
+  <path id="hadoop-maven-plugins.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="hadoop-maven-plugins.module.production.classpath">
+    <path refid="${module.jdk.classpath.hadoop-maven-plugins}"/>
+    <path refid="library.maven:_org.apache.maven:maven-plugin-api:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-model:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-artifact:3.0.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-inject-plexus:1.4.2.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-inject-bean:1.4.2.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-guice:noaop:2.1.7.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-core:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-settings:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-settings-builder:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-repository-metadata:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-model-builder:3.0.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-impl:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-spi:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-api:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-util:1.7.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-interpolation:1.14.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-utils:2.0.5.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-classworlds:2.2.3.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-component-annotations:1.5.5.classpath"/>
+    <path refid="library.maven:_org.sonatype.plexus:plexus-sec-dispatcher:1.3.classpath"/>
+    <path refid="library.maven:_org.sonatype.plexus:plexus-cipher:1.4.classpath"/>
+    <path refid="library.maven:_org.apache.maven.plugin-tools:maven-plugin-annotations:3.0.classpath"/>
+  </path>
+  
+  <path id="hadoop-maven-plugins.runtime.production.module.classpath">
+    <pathelement location="${hadoop-maven-plugins.output.dir}"/>
+    <path refid="library.maven:_org.apache.maven:maven-plugin-api:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-model:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-artifact:3.0.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-inject-plexus:1.4.2.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-inject-bean:1.4.2.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-guice:noaop:2.1.7.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-core:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-settings:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-settings-builder:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-repository-metadata:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-model-builder:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-aether-provider:3.0.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-impl:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-spi:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-api:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-util:1.7.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-interpolation:1.14.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-utils:2.0.5.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-classworlds:2.2.3.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-component-annotations:1.5.5.classpath"/>
+    <path refid="library.maven:_org.sonatype.plexus:plexus-sec-dispatcher:1.3.classpath"/>
+    <path refid="library.maven:_org.sonatype.plexus:plexus-cipher:1.4.classpath"/>
+  </path>
+  
+  <path id="hadoop-maven-plugins.module.classpath">
+    <path refid="${module.jdk.classpath.hadoop-maven-plugins}"/>
+    <pathelement location="${hadoop-maven-plugins.output.dir}"/>
+    <path refid="library.maven:_org.apache.maven:maven-plugin-api:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-model:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-artifact:3.0.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-inject-plexus:1.4.2.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-inject-bean:1.4.2.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-guice:noaop:2.1.7.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-core:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-settings:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-settings-builder:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-repository-metadata:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-model-builder:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-aether-provider:3.0.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-impl:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-spi:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-api:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-util:1.7.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-interpolation:1.14.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-utils:2.0.5.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-classworlds:2.2.3.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-component-annotations:1.5.5.classpath"/>
+    <path refid="library.maven:_org.sonatype.plexus:plexus-sec-dispatcher:1.3.classpath"/>
+    <path refid="library.maven:_org.sonatype.plexus:plexus-cipher:1.4.classpath"/>
+    <path refid="library.maven:_org.apache.maven.plugin-tools:maven-plugin-annotations:3.0.classpath"/>
+    <path refid="library.maven:_junit:junit:4.11.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+  </path>
+  
+  <path id="hadoop-maven-plugins.runtime.module.classpath">
+    <pathelement location="${hadoop-maven-plugins.testoutput.dir}"/>
+    <pathelement location="${hadoop-maven-plugins.output.dir}"/>
+    <path refid="library.maven:_org.apache.maven:maven-plugin-api:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-model:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-artifact:3.0.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-inject-plexus:1.4.2.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-inject-bean:1.4.2.classpath"/>
+    <path refid="library.maven:_org.sonatype.sisu:sisu-guice:noaop:2.1.7.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-core:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-settings:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-settings-builder:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-repository-metadata:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-model-builder:3.0.classpath"/>
+    <path refid="library.maven:_org.apache.maven:maven-aether-provider:3.0.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-impl:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-spi:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-api:1.7.classpath"/>
+    <path refid="library.maven:_org.sonatype.aether:aether-util:1.7.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-interpolation:1.14.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-utils:2.0.5.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-classworlds:2.2.3.classpath"/>
+    <path refid="library.maven:_org.codehaus.plexus:plexus-component-annotations:1.5.5.classpath"/>
+    <path refid="library.maven:_org.sonatype.plexus:plexus-sec-dispatcher:1.3.classpath"/>
+    <path refid="library.maven:_org.sonatype.plexus:plexus-cipher:1.4.classpath"/>
+    <path refid="library.maven:_org.apache.maven.plugin-tools:maven-plugin-annotations:3.0.classpath"/>
+    <path refid="library.maven:_junit:junit:4.11.classpath"/>
+    <path refid="library.maven:_org.hamcrest:hamcrest-core:1.3.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.hadoop-maven-plugins">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.hadoop-maven-plugins">
+    <patternset refid="excluded.from.module.hadoop-maven-plugins"/>
+  </patternset>
+  
+  <path id="hadoop-maven-plugins.module.sourcepath">
+    <dirset dir="${module.hadoop-maven-plugins.basedir}">
+      <include name="src/main/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.hadoop-maven-plugins" depends="compile.module.hadoop-maven-plugins.production,compile.module.hadoop-maven-plugins.tests" description="Compile module hadoop-maven-plugins"/>
+  
+  <target name="compile.module.hadoop-maven-plugins.production" depends="register.custom.compilers" description="Compile module hadoop-maven-plugins; production classes">
+    <mkdir dir="${hadoop-maven-plugins.output.dir}"/>
+    <javac2 destdir="${hadoop-maven-plugins.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.hadoop-maven-plugins}/javac">
+      <compilerarg line="${compiler.args.hadoop-maven-plugins}"/>
+      <bootclasspath refid="hadoop-maven-plugins.module.bootclasspath"/>
+      <classpath refid="hadoop-maven-plugins.module.production.classpath"/>
+      <src refid="hadoop-maven-plugins.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.hadoop-maven-plugins"/>
+    </javac2>
+    
+    <copy todir="${hadoop-maven-plugins.output.dir}">
+      <fileset dir="${module.hadoop-maven-plugins.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.hadoop-maven-plugins.tests" depends="register.custom.compilers,compile.module.hadoop-maven-plugins.production" description="compile module hadoop-maven-plugins; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.hadoop-maven-plugins" description="cleanup module">
+    <delete dir="${hadoop-maven-plugins.output.dir}"/>
+    <delete dir="${hadoop-maven-plugins.testoutput.dir}"/>
+  </target>
+</project>

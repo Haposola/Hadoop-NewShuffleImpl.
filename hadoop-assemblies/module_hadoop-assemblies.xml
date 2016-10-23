@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_hadoop-assemblies" default="compile.module.hadoop-assemblies">
+  <dirname property="module.hadoop-assemblies.basedir" file="${ant.file.module_hadoop-assemblies}"/>
+  
+  <property name="module.jdk.home.hadoop-assemblies" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.hadoop-assemblies" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.hadoop-assemblies" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.hadoop-assemblies" value="-encoding UTF-8 -source 1.6 -target 1.6 ${compiler.args}"/>
+  
+  <property name="hadoop-assemblies.output.dir" value="${module.hadoop-assemblies.basedir}/target/classes"/>
+  <property name="hadoop-assemblies.testoutput.dir" value="${module.hadoop-assemblies.basedir}/target/test-classes"/>
+  
+  <path id="hadoop-assemblies.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="hadoop-assemblies.module.production.classpath">
+    <path refid="${module.jdk.classpath.hadoop-assemblies}"/>
+  </path>
+  
+  <path id="hadoop-assemblies.runtime.production.module.classpath">
+    <pathelement location="${hadoop-assemblies.output.dir}"/>
+  </path>
+  
+  <path id="hadoop-assemblies.module.classpath">
+    <path refid="${module.jdk.classpath.hadoop-assemblies}"/>
+    <pathelement location="${hadoop-assemblies.output.dir}"/>
+  </path>
+  
+  <path id="hadoop-assemblies.runtime.module.classpath">
+    <pathelement location="${hadoop-assemblies.testoutput.dir}"/>
+    <pathelement location="${hadoop-assemblies.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.hadoop-assemblies">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.hadoop-assemblies">
+    <patternset refid="excluded.from.module.hadoop-assemblies"/>
+  </patternset>
+  
+  <path id="hadoop-assemblies.module.sourcepath">
+    <dirset dir="${module.hadoop-assemblies.basedir}">
+      <include name="src/main/resources"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.hadoop-assemblies" depends="compile.module.hadoop-assemblies.production,compile.module.hadoop-assemblies.tests" description="Compile module hadoop-assemblies"/>
+  
+  <target name="compile.module.hadoop-assemblies.production" depends="register.custom.compilers" description="Compile module hadoop-assemblies; production classes">
+    <mkdir dir="${hadoop-assemblies.output.dir}"/>
+    <javac2 destdir="${hadoop-assemblies.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.hadoop-assemblies}/javac">
+      <compilerarg line="${compiler.args.hadoop-assemblies}"/>
+      <bootclasspath refid="hadoop-assemblies.module.bootclasspath"/>
+      <classpath refid="hadoop-assemblies.module.production.classpath"/>
+      <src refid="hadoop-assemblies.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.hadoop-assemblies"/>
+    </javac2>
+    
+    <copy todir="${hadoop-assemblies.output.dir}">
+      <fileset dir="${module.hadoop-assemblies.basedir}/src/main/resources">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.hadoop-assemblies.tests" depends="register.custom.compilers,compile.module.hadoop-assemblies.production" description="compile module hadoop-assemblies; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.hadoop-assemblies" description="cleanup module">
+    <delete dir="${hadoop-assemblies.output.dir}"/>
+    <delete dir="${hadoop-assemblies.testoutput.dir}"/>
+  </target>
+</project>

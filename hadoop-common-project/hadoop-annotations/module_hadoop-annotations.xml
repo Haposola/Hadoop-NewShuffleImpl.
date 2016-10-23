@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_hadoop-annotations" default="compile.module.hadoop-annotations">
+  <dirname property="module.hadoop-annotations.basedir" file="${ant.file.module_hadoop-annotations}"/>
+  
+  <property name="module.jdk.home.hadoop-annotations" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.hadoop-annotations" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.hadoop-annotations" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.hadoop-annotations" value="-encoding UTF-8 -source 1.6 -target 1.6 ${compiler.args}"/>
+  
+  <property name="hadoop-annotations.output.dir" value="${module.hadoop-annotations.basedir}/target/classes"/>
+  <property name="hadoop-annotations.testoutput.dir" value="${module.hadoop-annotations.basedir}/target/test-classes"/>
+  
+  <path id="hadoop-annotations.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="hadoop-annotations.module.production.classpath">
+    <path refid="${module.jdk.classpath.hadoop-annotations}"/>
+    <path refid="library.maven:_jdiff:jdiff:1.0.9.classpath"/>
+    <pathelement location="${basedir}/../jdk1.8.0_77/lib/tools.jar"/>
+  </path>
+  
+  <path id="hadoop-annotations.runtime.production.module.classpath">
+    <pathelement location="${hadoop-annotations.output.dir}"/>
+    <pathelement location="${basedir}/../jdk1.8.0_77/lib/tools.jar"/>
+  </path>
+  
+  <path id="hadoop-annotations.module.classpath">
+    <path refid="${module.jdk.classpath.hadoop-annotations}"/>
+    <pathelement location="${hadoop-annotations.output.dir}"/>
+    <path refid="library.maven:_jdiff:jdiff:1.0.9.classpath"/>
+    <pathelement location="${basedir}/../jdk1.8.0_77/lib/tools.jar"/>
+  </path>
+  
+  <path id="hadoop-annotations.runtime.module.classpath">
+    <pathelement location="${hadoop-annotations.testoutput.dir}"/>
+    <pathelement location="${hadoop-annotations.output.dir}"/>
+    <path refid="library.maven:_jdiff:jdiff:1.0.9.classpath"/>
+    <pathelement location="${basedir}/../jdk1.8.0_77/lib/tools.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.hadoop-annotations">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.hadoop-annotations">
+    <patternset refid="excluded.from.module.hadoop-annotations"/>
+  </patternset>
+  
+  <path id="hadoop-annotations.module.sourcepath">
+    <dirset dir="${module.hadoop-annotations.basedir}">
+      <include name="src/main/java"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.hadoop-annotations" depends="compile.module.hadoop-annotations.production,compile.module.hadoop-annotations.tests" description="Compile module hadoop-annotations"/>
+  
+  <target name="compile.module.hadoop-annotations.production" depends="register.custom.compilers" description="Compile module hadoop-annotations; production classes">
+    <mkdir dir="${hadoop-annotations.output.dir}"/>
+    <javac2 destdir="${hadoop-annotations.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.hadoop-annotations}/javac">
+      <compilerarg line="${compiler.args.hadoop-annotations}"/>
+      <bootclasspath refid="hadoop-annotations.module.bootclasspath"/>
+      <classpath refid="hadoop-annotations.module.production.classpath"/>
+      <src refid="hadoop-annotations.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.hadoop-annotations"/>
+    </javac2>
+    
+    <copy todir="${hadoop-annotations.output.dir}">
+      <fileset dir="${module.hadoop-annotations.basedir}/src/main/java">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.hadoop-annotations.tests" depends="register.custom.compilers,compile.module.hadoop-annotations.production" description="compile module hadoop-annotations; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.hadoop-annotations" description="cleanup module">
+    <delete dir="${hadoop-annotations.output.dir}"/>
+    <delete dir="${hadoop-annotations.testoutput.dir}"/>
+  </target>
+</project>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_hadoop-hdfs-project" default="compile.module.hadoop-hdfs-project">
+  <dirname property="module.hadoop-hdfs-project.basedir" file="${ant.file.module_hadoop-hdfs-project}"/>
+  
+  <property name="module.jdk.home.hadoop-hdfs-project" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.hadoop-hdfs-project" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.hadoop-hdfs-project" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.hadoop-hdfs-project" value="-encoding UTF-8 -source 1.5 -target 1.5 ${compiler.args}"/>
+  
+  <property name="hadoop-hdfs-project.output.dir" value="${module.hadoop-hdfs-project.basedir}/target/classes"/>
+  <property name="hadoop-hdfs-project.testoutput.dir" value="${module.hadoop-hdfs-project.basedir}/target/test-classes"/>
+  
+  <path id="hadoop-hdfs-project.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="hadoop-hdfs-project.module.production.classpath">
+    <path refid="${module.jdk.classpath.hadoop-hdfs-project}"/>
+  </path>
+  
+  <path id="hadoop-hdfs-project.runtime.production.module.classpath">
+    <pathelement location="${hadoop-hdfs-project.output.dir}"/>
+  </path>
+  
+  <path id="hadoop-hdfs-project.module.classpath">
+    <path refid="${module.jdk.classpath.hadoop-hdfs-project}"/>
+    <pathelement location="${hadoop-hdfs-project.output.dir}"/>
+  </path>
+  
+  <path id="hadoop-hdfs-project.runtime.module.classpath">
+    <pathelement location="${hadoop-hdfs-project.testoutput.dir}"/>
+    <pathelement location="${hadoop-hdfs-project.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.hadoop-hdfs-project">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.hadoop-hdfs-project">
+    <patternset refid="excluded.from.module.hadoop-hdfs-project"/>
+  </patternset>
+  
+  
+  <target name="compile.module.hadoop-hdfs-project" depends="compile.module.hadoop-hdfs-project.production,compile.module.hadoop-hdfs-project.tests" description="Compile module hadoop-hdfs-project"/>
+  
+  <target name="compile.module.hadoop-hdfs-project.production" depends="register.custom.compilers" description="Compile module hadoop-hdfs-project; production classes"/>
+  
+  <target name="compile.module.hadoop-hdfs-project.tests" depends="register.custom.compilers,compile.module.hadoop-hdfs-project.production" description="compile module hadoop-hdfs-project; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.hadoop-hdfs-project" description="cleanup module">
+    <delete dir="${hadoop-hdfs-project.output.dir}"/>
+    <delete dir="${hadoop-hdfs-project.testoutput.dir}"/>
+  </target>
+</project>
