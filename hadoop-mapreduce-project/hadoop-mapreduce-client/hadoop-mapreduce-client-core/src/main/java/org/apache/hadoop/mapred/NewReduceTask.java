@@ -2,30 +2,29 @@ package org.apache.hadoop.mapred;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableFactories;
 import org.apache.hadoop.io.WritableFactory;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.DefaultCodec;
-import org.apache.hadoop.io.serializer.Deserializer;
-import org.apache.hadoop.io.serializer.SerializationFactory;
-import org.apache.hadoop.io.serializer.Serializer;
+import org.apache.hadoop.ipc.RPC;
 import org.apache.hadoop.mapreduce.TaskCounter;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormatCounter;
+import org.apache.hadoop.mapreduce.newShuffleImpl.NewShuffleDaemonProtocol;
+import org.apache.hadoop.mapreduce.newShuffleImpl.ReceiverStatus;
 import org.apache.hadoop.util.Progress;
 import org.apache.hadoop.util.ReflectionUtils;
 
-import java.io.*;
-import java.net.*;
-import java.util.ArrayList;
+import java.io.ByteArrayInputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by haposola on 16-5-31.
@@ -62,23 +61,12 @@ public class NewReduceTask<INKEY,INVALUE,OUTKEY,OUTVALUE> extends Task {
                             }
                         });
     }
-
     boolean isFastStart;
-    String jarPath;
-    String jobPath;
-    Class reducerClass ,iKeyClass,iValClass, oKeyClass, oValClass, cmptrClass;
-    JobConf job;
-    NewShuffleReceiver shuffleThread;
-    String tmpOutDir;
-    TaskAttemptID taskID;
-    TaskReporter reporter;
-    SerializationFactory serializationFactory;
-    org.apache.hadoop.mapreduce.RecordWriter<OUTKEY, OUTVALUE> writer;
+    private int numMaps;
+
+    private CompressionCodec codec;
     //RawComparator comparator;
-    ArrayList<Thread> workThreads;
-    int numMaps;
-    boolean mapAllFinished;
-    MultiLock mainLock;
+
     ConcurrentHashMap<INKEY, Vector<INVALUE>> keyValue = new ConcurrentHashMap<INKEY, Vector<INVALUE>>();
     ConcurrentHashMap<Integer, Integer> hostID = new ConcurrentHashMap<Integer, Integer>();
     private Progress copyPhase;
@@ -156,6 +144,28 @@ public class NewReduceTask<INKEY,INVALUE,OUTKEY,OUTVALUE> extends Task {
         numMaps = in.readInt();
     }
 
+    void queryReceiverStatus(){
+        InetSocketAddress addr = new InetSocketAddress("localhost", 21116);
+        boolean receiverRunning=true;
+        NewShuffleDaemonProtocol proxy = null;
+        try {
+            proxy = RPC.waitForProxy(NewShuffleDaemonProtocol.class, 1, addr, new Configuration());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        JobID jobId = getJobID();
+        while(receiverRunning) {
+            try {
+                Thread.sleep(1000);
+                if (proxy.getLocalReceiverStatus(jobId) == ReceiverStatus.COMPLETE) {
+                    receiverRunning = false;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
     @Override
     public void run(JobConf job, TaskUmbilicalProtocol umbilical)
             throws IOException, ClassNotFoundException, InterruptedException {
@@ -163,9 +173,18 @@ public class NewReduceTask<INKEY,INVALUE,OUTKEY,OUTVALUE> extends Task {
             copyPhase = getProgress().addPhase("copy");
             reducePhase = getProgress().addPhase("reduce");
         }
-        reporter = new TaskReporter(new Progress(), umbilical);
+        TaskReporter reporter = startReporter(umbilical);
         LOG.info("seeing NewReduce Running YO");
+        queryReceiverStatus();//spin in this function
+        //Then we should start to sort the temporary files
 
+
+        //Still Two types of ReduceTasks
+        //FastStart will directly read data from Receiver's partial output files
+            //And will desperately ZHENG QIANG DISK IO with ShuffleReceiver.
+        //Normal will just wait for ShuffleReceiver's finish signal
+            //Then start to Read and Sort and Reduce. May be multi-threaded.
+        done(umbilical, reporter);
     }
 
     static class NewTrackingRecordWriter<K, V>
@@ -225,121 +244,7 @@ public class NewReduceTask<INKEY,INVALUE,OUTKEY,OUTVALUE> extends Task {
         }
     }
 
-    class NewShuffleReceiver extends Thread {
-        Deserializer<INKEY> keyDeserializer;
-        Deserializer<INVALUE> valDeserializer;
 
-        public NewShuffleReceiver(int i) {
-            this.setName("ShuffleReceiver" + String.valueOf(i));
-        }
-
-        public void run() {
-            LOG.info(this.getName() + " starts to run");
-            keyDeserializer = serializationFactory.getDeserializer(iKeyClass);
-            valDeserializer = serializationFactory.getDeserializer(iValClass);
-            while (!mapAllFinished) {
-                try {
-                    byte[] buffer = new byte[65508];
-                    DatagramPacket dp = new DatagramPacket(buffer, 65508);
-                    DatagramSocket socket = new DatagramSocket(null);
-                    String host = InetAddress.getLocalHost().getCanonicalHostName();
-                    socket.setReuseAddress(true);
-                    socket.bind(new InetSocketAddress(host, 20016));
-                    socket.receive(dp);
-                    byte[] data = dp.getData().clone();
-                    int length = dp.getLength();
-                    InetAddress from = dp.getAddress();
-                    int port = dp.getPort();
-                    socket.close();
-                    int ID = 0;
-                    for (int i = 3; i >= 0; i--) {
-                        ID = ID << 8;
-                        ID += (int) data[i];
-                    }
-                    int source = 0;
-                    for (int i = 7; i >= 4; i--) {
-                        source = source << 8;
-                        source += (int) data[i];
-                    }
-                    LOG.info(this.getName() + " received data : " + String.valueOf(length) +
-                            " from " + String.valueOf(source) + " with ID " + String.valueOf(ID));
-                    new ACKSender(from, port).start();//Send ACK back
-                    LOG.info("Sending ACK to " + from + " " + String.valueOf(ID));
-
-                    if (!hostID.containsKey(source)) {
-                        hostID.put(source, 0);
-                    } else if (ID <= hostID.get(source)) continue;
-                    else {
-                        hostID.put(source, ID);
-                    }
-                    //if(!hostID.containsKey(host) && ID<=hostID.get(host))continue;s
-                    mainLock.lock();
-                    try {
-                        KVStream buf = new KVStream(data, 8, length - 8);
-                        keyDeserializer.open(buf);
-                        valDeserializer.open(buf);
-                        while (buf.available() > 0) {
-                            INKEY k = null;
-                            k = keyDeserializer.deserialize(k);
-                            INVALUE v = null;
-                            v = valDeserializer.deserialize(v);
-                            if (keyValue.containsKey(k)) {//TODO : FATAL PROBLEM, COMPARATOR NEEDED
-                                keyValue.get(k).add(v);
-                            } else {
-                                Vector<INVALUE> tmp = new Vector<INVALUE>();
-                                tmp.add(v);
-                                keyValue.put(k, tmp);
-                                //Thread frt= new FocusedReducer(k,this);//TODO : A thread for each key is really stupid
-                                //workThreads.add(frt);
-                                //frt.start();
-                            }
-                        }
-                        keyDeserializer.close();
-                        valDeserializer.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        mainLock.unlock();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-
-                }
-            }
-        }
-
-        class ACKSender extends Thread {
-            InetAddress source;
-            int port;
-
-            public ACKSender(InetAddress source, int port) {
-                this.source = source;
-                this.port = port;
-            }
-
-            public void run() {
-                byte[] data = new byte[3];
-                data[0] = (byte) 'A';
-                data[1] = (byte) 'C';
-                data[2] = (byte) 'K';
-                DatagramPacket dp = new DatagramPacket(data, 3, source, port);
-                DatagramSocket tmp = null;
-                boolean portAlreadyInUse = false;
-                do try {
-                    tmp = new DatagramSocket();
-                    portAlreadyInUse = false;
-                    tmp.send(dp);
-                } catch (SocketException e) {
-                    portAlreadyInUse = true;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } while (portAlreadyInUse);
-                if (tmp != null) tmp.close();
-                tmp = null;
-            }
-        }
-    }
 
     class KVStream extends ByteArrayInputStream{
         //Exciting. This stream need not to be manually maintained
@@ -347,135 +252,5 @@ public class NewReduceTask<INKEY,INVALUE,OUTKEY,OUTVALUE> extends Task {
             super(buf,off,len);
         }
     }
-
-    //Seems that I need a signal to tell  PartialReduce that there is no more input;
-    //There should be one FocusedReduceThread for every vector in keyValue-HashMap
-    class FocusedReducer extends Thread{
-        INKEY keyOfThis;
-        Thread shuffleThread;//Using this reference to check ShuffleThread's aliveness. Only PartialThread Needs This.
-        org.apache.hadoop.mapreduce.Reducer<INKEY,INVALUE,OUTKEY,OUTVALUE> reducer;
-        public FocusedReducer(INKEY key,Thread shuffleThread){
-            this.keyOfThis=key;
-            reducer = (org.apache.hadoop.mapreduce.Reducer<INKEY,INVALUE,OUTKEY,OUTVALUE>)
-                    ReflectionUtils.newInstance(reducerClass, job);
-            this.shuffleThread=shuffleThread;
-        }
-        @Override
-        public void run(){
-            LOG.info("running NEW reduce task");
-            if(isFastStart){
-                runFastStart();
-            }else{
-                runNormal();
-            }
-        }
-        void runFastStart(){
-            //FastStart is equal to PartialReduce. We should make a context that maintains a partial result,
-            //And reducer.context.write() means write this partial result.
-            mainLock.lock();
-            try {
-                //TODO : the final thing is a signal to tell it to interrupt,
-                //              without influence the remaining values in the vector.
-                org.apache.hadoop.mapreduce.Reducer.Context
-                        reducerContext = createReduceContext(job,taskID,writer,committer,reporter,keyOfThis,keyValue.get(keyOfThis));
-                //BAD BAD, Drag all reducer code here. Because PartialReduce may run several times, but setup() won't.
-                //reducer.setup(reducerContext);
-                //while(true){
-                // if(keyValue.get(keyOfThis).isEmpty() && shuffleThread.isAlive())
-                //   break;
-                //reducer.reduce(keyOfThis,keyValue.get(keyOfThis),reducerContext);
-                // }
-                //reducer.cleanup(reducerContext);
-
-                //((NewReduceContextImpl)reducerContext).writeFinal();
-            }catch (Exception e){
-                e.printStackTrace();
-            } finally{
-                mainLock.unlock();
-            }
-        }
-        void runNormal(){
-            //start Event Fetcher
-            //TODO : use a event to change this val in EventFetcher thread.
-            mainLock.lock();
-            Serializer<INVALUE>odv=serializationFactory.getSerializer(iValClass);
-            String tmp=keyOfThis.toString();String tmpOutFile;
-            if(tmp.length()>30)tmpOutFile=tmp.substring(0,30);
-            else tmpOutFile=tmp;
-            File tmpFile=new File(tmpOutDir,tmpOutFile);
-
-            try {
-                LOG.info("Creating tempFile " +tmpFile.getName());
-                if(!tmpFile.exists())tmpFile.createNewFile();
-                odv.open(new FileOutputStream(tmpFile,true));
-                while (!mapAllFinished) {
-                    while (keyValue.get(keyOfThis).size() > 0) {
-                        odv.serialize(keyValue.get(keyOfThis).remove(0));
-                    }
-                }
-                while (keyValue.get(keyOfThis).size() > 0) {
-                    odv.serialize(keyValue.get(keyOfThis).remove(0));
-                }
-                org.apache.hadoop.mapreduce.Reducer.Context
-                        reducerContext = createReduceContext(job,taskID,writer,committer,reporter,keyOfThis,tmpFile,iValClass);
-                reducer.run(reducerContext);
-            }catch (Exception e){
-                e.printStackTrace();
-            }finally {
-                mainLock.unlock();
-            }
-            LOG.info("Reducer of "+ keyOfThis.toString()+ " complete and exits");
-        }
-    }
-
-
-    class MultiLock implements Lock{
-        int count;
-        ReentrantLock countLock;
-
-        public MultiLock() {
-            count = 0;
-            countLock = new ReentrantLock();
-        }
-
-        public int getLockNumber(){
-            return count;
-        }
-
-        @Override
-        public void lock() {
-            countLock.lock();
-            count = count + 1;
-            countLock.unlock();
-        }
-
-        @Override
-        public void lockInterruptibly() throws InterruptedException {
-
-        }
-
-        @Override
-        public boolean tryLock() {
-            return false;
-        }
-
-        @Override
-        public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
-            return false;
-        }
-
-        @Override
-        public void unlock() {
-            countLock.lock();
-            count=count-1;
-            countLock.unlock();
-        }
-
-        @Override
-        public Condition newCondition() {
-            return null;
-        }
-    }
-
 }
 

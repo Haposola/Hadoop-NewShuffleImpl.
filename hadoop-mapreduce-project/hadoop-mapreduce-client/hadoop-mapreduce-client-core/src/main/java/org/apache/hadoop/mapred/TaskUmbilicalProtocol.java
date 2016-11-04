@@ -160,5 +160,10 @@ public interface TaskUmbilicalProtocol extends VersionedProtocol {
                                                        int maxLocs,
                                                        TaskAttemptID id) 
   throws IOException;
+  MapTaskCompletionEventsUpdate getMapCompletionEvents(JobID jobId,
+                                                       int fromIndex,
+                                                       int maxLocs
+                                                       )
+          throws IOException;
 
 }

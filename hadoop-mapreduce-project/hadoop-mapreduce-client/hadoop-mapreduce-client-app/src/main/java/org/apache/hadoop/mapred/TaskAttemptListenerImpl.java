@@ -290,6 +290,23 @@ public class TaskAttemptListenerImpl extends CompositeService
     
     return new MapTaskCompletionEventsUpdate(events, shouldReset);
   }
+    @Override
+    public MapTaskCompletionEventsUpdate getMapCompletionEvents(
+            JobID jobIdentifier, int startIndex, int maxEvents
+            ) throws IOException {
+        LOG.info("MapCompletionEvents request from newShuffleImpl in job " + jobIdentifier.toString()
+                + ". startIndex " + startIndex + " maxEvents " + maxEvents);
+
+        // TODO: shouldReset is never used. See TT. Ask for Removal.
+        boolean shouldReset = false;
+        org.apache.hadoop.mapreduce.v2.api.records.JobId jobID =
+                TypeConverter.toYarn(jobIdentifier);
+        TaskCompletionEvent[] events =
+                context.getJob(jobID).getMapAttemptCompletionEvents(
+                        startIndex, maxEvents);
+
+        return new MapTaskCompletionEventsUpdate(events, shouldReset);
+    }
 
   @Override
   public boolean ping(TaskAttemptID taskAttemptID) throws IOException {

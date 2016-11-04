@@ -1639,15 +1639,16 @@ public class JobImpl implements org.apache.hadoop.mapreduce.v2.app.job.Job,
             try {
                 DistributedFileSystem dfs = (DistributedFileSystem) FileSystem.get(job.loadConfFile());
                 DatanodeInfo[] dni = dfs.getDataNodeStats();
-                String jobFile = job.getConfFile().toString();
-                InetSocketAddress tal = job.taskAttemptListener.getAddress();
+                //TODO : make a preferred location list as Spark's impl.
                 int num = dni.length;
                 int partitions = Integer.parseInt(job.conf.get("mapreduce.job.reduces"));
+                InetSocketAddress tal= job.taskAttemptListener.getAddress();
                 for (int i = 0; i < partitions; i++) {
                     String hostname = dni[i % num].getHostName();
                     InetSocketAddress addr = new InetSocketAddress(hostname, 21116);
                     NewShuffleDaemonProtocol proxy = RPC.waitForProxy(NewShuffleDaemonProtocol.class, 1, addr, new Configuration());
-                    proxy.startReduceTask(job.getID().toString(), jobFile, tal.getHostName(), tal.getPort(), job.applicationAttemptId.toString(), i);
+                    int port = proxy.startShuffleReceiver(job.oldJobId,tal.getHostName() ,tal.getPort() ,job.numMapTasks );
+                    //TODO: Record startShuffleReceiver's return value as ShufflePort, as init. parameters of MapOutCollectAndPush.
                 }
             } catch (IOException e) {
                 LOG.info("Error calling Reduce RPC server");

@@ -10,7 +10,7 @@ import org.apache.hadoop.mapred.MapTaskCompletionEventsUpdate;
 import org.apache.hadoop.mapred.TaskCompletionEvent;
 import org.apache.hadoop.mapred.TaskUmbilicalProtocol;
 import org.apache.hadoop.mapreduce.TaskAttemptID;
-
+import org.apache.hadoop.mapred.JobID;
 import java.io.IOException;
 
 public class NewEventFetcher<K,V> extends Thread {
@@ -19,22 +19,20 @@ public class NewEventFetcher<K,V> extends Thread {
     private static final int RETRY_PERIOD = 5000;
     private static final Log LOG = LogFactory.getLog(NewEventFetcher.class);
 
-    private final TaskAttemptID reduce;
     private final TaskUmbilicalProtocol umbilical;
-
+    private JobID jobId;
     private int fromEventIdx = 0;
     private final int maxEventsToFetch;
 
     int totalMaps;
     private volatile boolean stopped = false;
 
-    public NewEventFetcher(TaskAttemptID reduce,
+    public NewEventFetcher(JobID jobId,
                         TaskUmbilicalProtocol umbilical,
                         int maxEventsToFetch,int totalMaps
     ) {
         setName("EventFetcher for fetching Map Completion Events");
         setDaemon(true);
-        this.reduce = reduce;
         this.umbilical = umbilical;
         this.maxEventsToFetch = maxEventsToFetch;
         this.totalMaps=totalMaps;
@@ -43,7 +41,7 @@ public class NewEventFetcher<K,V> extends Thread {
     @Override
     public void run() {
         int failures = 0;
-        LOG.info(reduce + " Thread started: " + getName());
+        LOG.info( "Thread started: " + getName());
         int mapsCount=0;
         try {
             while (!stopped && !Thread.currentThread().isInterrupted()) {
@@ -52,7 +50,7 @@ public class NewEventFetcher<K,V> extends Thread {
                     failures = 0;
 
                     if (numNewMaps > 0) {
-                        LOG.info(reduce + ": " + "Got " + numNewMaps + " new map-outputs");
+                        LOG.info( ": " + "Got " + numNewMaps + " new map-outputs");
                     }
                     LOG.debug("GetMapEventsThread about to sleep for " + SLEEP_TIME);
                     mapsCount+=numNewMaps;
@@ -111,10 +109,10 @@ public class NewEventFetcher<K,V> extends Thread {
         do {
             MapTaskCompletionEventsUpdate update =
                     umbilical.getMapCompletionEvents(
-                            (org.apache.hadoop.mapred.JobID)reduce.getJobID(),
+                            jobId,
                             fromEventIdx,
-                            maxEventsToFetch,
-                            (org.apache.hadoop.mapred.TaskAttemptID)reduce);
+                            maxEventsToFetch
+                            );
             events = update.getMapTaskCompletionEvents();
             LOG.debug("Got " + events.length + " map completion events from " +
                     fromEventIdx);

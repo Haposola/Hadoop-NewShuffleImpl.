@@ -14,16 +14,18 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.ipc.ProtocolSignature;
 import org.apache.hadoop.ipc.RPC;
 import org.apache.hadoop.ipc.Server;
+import org.apache.hadoop.mapreduce.JobID;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
+import java.util.HashMap;
 
 
 public  class NewShuffleRpcServiceDaemon {
-    //ConcurrentHashMap<> RunningReduceTasks;
-    //TODO: need to know the running ReduceTasks. To inform them that its MapTasks is finished?
-    //Or use umbilical to fetch JobTracker Events?
+
+    //TODO : RpcServiceDaemon is bounded on port 21116
     private static final Log LOG = LogFactory.getLog(NewShuffleRpcServiceDaemon.class.getName());
     Server server;
     public NewShuffleRpcServiceDaemon(){
@@ -45,75 +47,71 @@ public  class NewShuffleRpcServiceDaemon {
 
     public static void main(String[] args) throws Exception {
         new NewShuffleRpcServiceDaemon();
-
-
-        //for(int i=0;i<5;i++) {
-        //   Thread receive = new NewShuffleRpcServiceDaemon();
-        // receive.start();
-        // }
     }
 
     class RpcService implements NewShuffleDaemonProtocol {
-        Configuration conf;
 
+        HashMap<JobID,ReceiverStatus> runningReceivers= new HashMap<JobID,ReceiverStatus>();
+        HashMap<JobID,Integer> receiverPorts = new HashMap<JobID, Integer>();
         @Override
-        public void setConfiguration(Configuration conf) {
-            this.conf=conf;
-        }
-
-        @Override
-        public void startReduceTask(
-                String jobId
-                ,String jobFile// It seems a symbolic link should be created for this file. jobFile ->"job.xml"
-                //int numMapTasks,
-                ,String host, int port//TaskAttemptListener taskAttemptListener,//used
-                ,String appId//used
-                ,int partition
-                //int id,
-                //int num
-        ) {
-            //String sid=String.valueOf(num);
-            //int l=sid.length();
-            //for(int i=0;i<6-l;i++)sid="0"+sid;
-            //new JobId
-            LOG.info("Starting ReduceTask with AttemptID : "+ appId);
-            /*
-            String appAttemptId="attempt_"+
-                    String.valueOf(appId)+"_"
-                    +String.valueOf(id)+"_"
-                    +"r_"+sid+"_"
-                    +String.valueOf(0);
-            */
-
-            
-            //args.add(String.valueOf()); TODO: what if we don't use JVM ID?
+        public int startShuffleReceiver(JobID jobID, String host, int port, int numOfMaps) {
+            LOG.info("Starting ShuffleReceiver for job " + jobID.toString());
+            runningReceivers.put(jobID,ReceiverStatus.RUNNING);
+            Socket socket = null;
             try {
                 LOG.info("Starting Process Builder");
+                //Pick a free port and pass it to ShuffleReceiver
+                socket =new Socket();
+                socket.setReuseAddress(true);
+                //TODO : Integrate this class into Hadoop's Daemon system.
                 ProcessBuilder x=new ProcessBuilder(
-                        "/home/haposola/hadoop/ReduceTaskShells/RunReduceTask.sh"
-                        ,jobId,jobFile
-                        ,host
-                        ,String.valueOf(port)
-                        ,appId
-                        ,String.valueOf(partition)
-                        //appAttemptId,
-                        //String.valueOf(numMapTasks),
-                        //host, String.valueOf(port)
+                        "/home/haposola/hadoop/ReduceTaskShells/RunShuffleReceiver.sh"
+                        ,jobID.toString()
+                        ,String.valueOf(socket.getLocalPort())
+                        ,host,String.valueOf(port),String.valueOf(numOfMaps)
                         );
                 x.redirectOutput(new File("/home/haposola/hadoop/ReduceTaskShells/RunLog"));
                 x.start();
                 //How To new a JVM?0
                 //HHH, eventually it is to run a script
-                //reduce.run(umbilical);
-                //new Shuffle().start();
+
             }catch (IOException e){
-                LOG.warn("ERROR when executing bash to launch ReduceChild");
+                LOG.warn("ERROR when executing bash to launch ShuffleReceiver");
                 LOG.info(e.getMessage());
                 e.printStackTrace();
 
             }
+            return socket.getLocalPort();
         }
 
+        @Override
+        public ReceiverStatus getLocalReceiverStatus(JobID jobID) {
+            ReceiverStatus status=runningReceivers.get(jobID);
+            if(status== ReceiverStatus.COMPLETE){
+                //So when COMPLETE status is queried, it will never be queried any more.
+                runningReceivers.remove(jobID);
+            }
+            return status;
+        }
+
+        @Override
+        public void completeReceiver(JobID jobID) {
+            //Receiver reports its completion and mark itself as COMPLETE
+            //This record is to be removed when ReduceTask queries this status
+            runningReceivers.put(jobID,ReceiverStatus.COMPLETE);
+            receiverPorts.remove(jobID);
+        }
+/*
+        @Override
+        public void updateShufflePort(JobID jobID, int port) {
+            receiverPorts.put(jobID,port);
+        }
+
+        @Override
+        public int getShufflePort(JobID jobID) {
+            return receiverPorts.get(jobID);
+        }
+*/
         @Override
         public long getProtocolVersion(String protocol, long clientVersion) throws IOException {
             return versionID;

@@ -120,7 +120,7 @@ public class MapOutputCollectAndPush<K, V>
 
             int round_robin = 0;
 
-            while (reporter.getProgress() < 0.667f) {//TODO : This is not well compitable
+            while (reporter.getProgress() < 0.667f) {//TODO : This is not well compatible
                 CircularBuffer tempCB = workers.get(round_robin);
                 ByteCircularBuffer buffer = tempCB.buffer;
                 int len = buffer.occupiedBlocks();
