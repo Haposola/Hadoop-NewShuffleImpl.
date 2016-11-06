@@ -15,11 +15,9 @@ import org.apache.hadoop.mapred.Task;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by haposola on 16-5-24.
@@ -31,10 +29,11 @@ public class MapOutputCollectAndPush<K, V>
 
     private static final Log LOG = LogFactory.getLog(MapOutputCollectAndPush.class);
     public PushThread pushThread;
-    MapTask mapTask;
+
     ArrayList<CircularBuffer> workers;
+    //We use ArrayList here to avoid GenericArrayCreation problem
     InetAddress[] reduceHosts;
-    int mapID;
+    //String mapID;
     private JobConf job;
     private Task.TaskReporter reporter;
     private int partitions;
@@ -51,12 +50,11 @@ public class MapOutputCollectAndPush<K, V>
         LOG.info("Initialization of MapOutputCollector");
         job = context.getJobConf();
         reporter = context.getReporter();
-        mapTask = context.getMapTask();
         partitions = job.getNumReduceTasks();
 
         keyClass = (Class<K>)job.getMapOutputKeyClass();
         valClass = (Class<V>)job.getMapOutputValueClass();
-        mapID = Integer.parseInt(mapTask.getTaskID().toString().split("_")[4]);
+        //mapID = context.getMapTask().getTaskID().toString().split("_")[4];
 
         if(FileSystem.get(job) instanceof LocalFileSystem){
             reduceHosts=new InetAddress[1];
@@ -112,45 +110,58 @@ public class MapOutputCollectAndPush<K, V>
 
     // Compression for map-outputs
     class PushThread extends Thread {
-        //Round-robin to get reference of the CircularBuffer s.
-
+        // consume data in the buffer and send it over the network
+        DatagramSocket[] partitionSockets;
+        public PushThread(){
+            partitionSockets=new DatagramSocket[partitions];
+            for(int i=0;i<partitions;i++){
+                while(true){
+                    try {
+                        DatagramSocket socket = new DatagramSocket();
+                        partitionSockets[i]=socket;
+                        break;
+                    }catch (Exception ignored){}
+                }
+            }
+        }
         @Override
         public void run() {
-            // consume data in the buffer and send it over the network
 
+            //Round-robin to get reference of the CircularBuffers.
             int round_robin = 0;
-
+            CircularBuffer tempCB;
+            ByteCircularBuffer buffer;
             while (reporter.getProgress() < 0.667f) {//TODO : This is not well compatible
-                CircularBuffer tempCB = workers.get(round_robin);
-                ByteCircularBuffer buffer = tempCB.buffer;
+                tempCB= workers.get(round_robin);
+                buffer = tempCB.buffer;
                 int len = buffer.occupiedBlocks();
                 if (len > 0) {
                     LOG.info("Got " + String.valueOf(len + 8) + " bytes to send");
                     int tail = buffer.getTail();
                     int head = (tail + len + buffer.getSize()) % buffer.getSize();
-                    byte[] b = new byte[len + 8];
-                    int tmp = tempCB.msgID;
+                    byte[] b = new byte[len + 14];
+                    int tmp = tempCB.msgID;//TODO : Re-think msgID for if it can be replaced by boolean value.
+                    //A msg is identified by msgID-bufID-mapID
+                    //The ShuffleReceiver can tell one buffer from another JUST with PortInfo in the DatagramPacket
+                    //So there is only msgID
                     for (int i = 0; i < 4; i++) {
                         b[i] = (byte) (tmp & 0xFF);
                         tmp = tmp >> 8;
                     }
-                    int tmp1 = mapID;
-                    for (int i = 4; i < 8; i++) {
-                        b[i] = (byte) (tmp1 & 0xFF);
-                        tmp1 = tmp1 >> 8;
-                    }
-                    buffer.get(b, 8, tail, head);
-                    //TODO : The communication process may need to be redesigned
-                    DatagramPacket dp = new DatagramPacket(b, len + 8, reduceHosts[tempCB.partition], 20016);
-                    boolean portAlreadyInUse = false, retransitionNeeded = true;
+
+                    //String bufID=mapID;
+                    //System.arraycopy(bufID.getBytes(),0,b,4,bufID.length());
+                    buffer.get(b, 4, tail, head);
+
+                    DatagramPacket dp = new DatagramPacket(b, len + 4, reduceHosts[tempCB.partition], 20016);
+                    boolean  retransitionNeeded = true;
                     do {
-                        DatagramSocket socket = null;
+                        DatagramSocket socket=partitionSockets[round_robin];
                         try {
-                            socket = new DatagramSocket();
-                            portAlreadyInUse = false;
                             socket.send(dp);
                             LOG.info("Sended a packet");
                             DatagramPacket ACK = new DatagramPacket(new byte[100], 100);
+                            //TODO: ACK waiting time is set to 5000ms
                             socket.setSoTimeout(5000);
                             socket.receive(ACK);
                             byte[] data = ACK.getData();
@@ -164,17 +175,11 @@ public class MapOutputCollectAndPush<K, V>
                             } else {
                                 LOG.info("Broken ACK received");
                             }
-                        } catch (SocketException e) {
-                            if (socket != null) socket.close();
-                            socket = null;
-                            portAlreadyInUse = true;
-                        } catch (IOException e) {
+                        }catch (Exception e) {
                             LOG.info("Exception when running push Thread, " + e.getMessage());
                             e.printStackTrace();
-                        } finally {
-                            if (socket != null) socket.close();
                         }
-                    } while (portAlreadyInUse && retransitionNeeded);
+                    } while (retransitionNeeded);
                 }
                 round_robin = (round_robin + 1) % partitions;
             }

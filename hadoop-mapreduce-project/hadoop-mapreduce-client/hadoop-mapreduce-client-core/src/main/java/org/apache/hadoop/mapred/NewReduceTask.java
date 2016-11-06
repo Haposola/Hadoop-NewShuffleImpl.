@@ -91,7 +91,7 @@ public class NewReduceTask<INKEY,INVALUE,OUTKEY,OUTVALUE> extends Task {
 
     {
         getProgress().setStatus("reduce");
-        setPhase(TaskStatus.Phase.SHUFFLE);        // phase to start with
+        setPhase(TaskStatus.Phase.REDUCE);        // phase to start with
     }
     public NewReduceTask(){
         super();

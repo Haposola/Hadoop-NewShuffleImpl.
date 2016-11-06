@@ -10,9 +10,9 @@ import org.apache.hadoop.mapred.TaskUmbilicalProtocol;
 import org.apache.hadoop.net.NetUtils;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetSocketAddress;
+import java.net.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * //Created by haposola on 16-6-2.
@@ -26,76 +26,233 @@ import java.net.InetSocketAddress;
  * MapCompletionEventFetcher needs too many arguments,
  * Almost catch up to the initialization of YarnChild.
  * NOT VERY COMFORTABLE
+ *
+ * Threads in ShuffleReceiver
+ *  3   =numOfThreads   ReceiveThreads
+ *  1                   MapCompleteEventFetcher
+ *  1                   ackSender
+ *  1   =numOf          flushThread
+ *  1                   mainThread
  */
 public class ShuffleReceiver {
     private static final Log LOG = LogFactory.getLog(ShuffleReceiver.class);
-    private static JobID jobId;
-    private static int shufflePort;
-    private static int numOfThreads = 5;
+    private static int numOfThreads = 3;
+    private static boolean mapAllFinished;
+    private static LinkedBlockingDeque<DatagramPacket> pendingACKMsgs;
 
-    //TODO : number of threads to simultaneously receiver data is set to 5
+    private static ReceiveThread[] receivers;
+    //TODO : number of threads to simultaneously receive data is set to 3
     public static void main(String[]args)throws  Throwable {
         LOG.info("ShuffleReceiver Running for JobID " + args[1]);
 
-        jobId = JobID.forName(args[1]);
-        shufflePort = Integer.parseInt(args[2]);
+        JobID jobId = JobID.forName(args[1]);
         String host = args[3];
         int port = Integer.parseInt(args[4]);
         int numOfMaps= Integer.parseInt(args[5]);
+
+
+        pendingACKMsgs =new LinkedBlockingDeque<DatagramPacket>();
+
 
         final InetSocketAddress address =
                 NetUtils.createSocketAddrForHost(host, port);
         //TODO : RpcServiceDaemon is bounded on shufflePort 21116
         InetSocketAddress addr = new InetSocketAddress("localhost", 21116);
         NewShuffleDaemonProtocol proxy = null;
+        TaskUmbilicalProtocol umbilical=null;
         try {
             proxy = RPC.waitForProxy(NewShuffleDaemonProtocol.class, 1, addr, new Configuration());
+            umbilical = RPC.getProxy(TaskUmbilicalProtocol.class,
+                    TaskUmbilicalProtocol.versionID, address, new JobConf());
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Thread ackSender = new ACKSender();
+        ackSender.start();
         //bind several receiver threads onto on shufflePort
+        receivers = new ReceiveThread[numOfThreads];
         for(int i=0;i<numOfThreads;i++){
-            new receiveThread().run();
+            receivers[i]=new ReceiveThread(Integer.parseInt(args[2]));
+            receivers[i].start();
         }
-        final TaskUmbilicalProtocol umbilical = RPC.getProxy(TaskUmbilicalProtocol.class,
-                TaskUmbilicalProtocol.versionID, address, new JobConf());
-        //TODO : Is a  newed JobConf safe?
+        Flusher flusher =new Flusher();
+        flusher.start();
 
         // Start the map-completion events fetcher thread
         final NewEventFetcher eventFetcher =
                 new NewEventFetcher(jobId,umbilical,100,numOfMaps);
         eventFetcher.start();
-        //Then how this JVMTask knows its work is finished?
-            //Condition: all MapTasks of this job is finished
-        //So, eventFetcher.
+        eventFetcher.join();
+        //We expect main thread will wait for eventFetcher's exit
+        mapAllFinished=true;
 
+        for(int i=0;i<numOfThreads;i++){
+            receivers[i].join();
+        }
+        //main thread would exit when:
+        //Receivers all exited
+        ackSender.interrupt();
 
         if (proxy != null) {
             proxy.completeReceiver(jobId);
         }
     }
 
-    static class receiveThread extends Thread{
-
+    static class ReceiveThread extends Thread{
+        private static ConcurrentHashMap<InetSocketAddress,Integer> msgIDs;
         DatagramSocket socket=null;
+        DoubleByteCircularBuffer dbcBuf;
+        private static byte[] ackMsg= new byte[7];
+        int shufflePort;
+        public ReceiveThread(int port){
+            this.shufflePort=port;
+            msgIDs=new ConcurrentHashMap<InetSocketAddress, Integer>();
+            ackMsg[0] = (byte) 'A';
+            ackMsg[1] = (byte) 'C';
+            ackMsg[2] = (byte) 'K';
+        }
+        public DoubleByteCircularBuffer getDbcBuf(){return dbcBuf;}
         @Override
         public void run(){
             boolean concurrentConcerns=true;
-            while(concurrentConcerns){
+            while(concurrentConcerns){//Concern: maybe when newPort is executed, other threads hasn't set it's own socket as reusable.
                 try{
                     socket=new DatagramSocket(shufflePort);
+                    socket.setReuseAddress(true);
+
                     concurrentConcerns=false;
+                    /*
+                    DatagramSocket socket = new DatagramSocket(null);
+                    String host = InetAddress.getLocalHost().getCanonicalHostName();
+                    socket.setReuseAddress(true);
+                    socket.bind(new InetSocketAddress(host, 20016));
+                    socket.receive(dp);
+                    */
+
                 }catch (Exception e){
-                    e.printStackTrace();
+                    System.out.println("Racing socket initialization.");
                 }
             }
-            DatagramPacket packet= new DatagramPacket(new byte[2048],2048);
-            try {
-                socket.receive(packet);
-            } catch (IOException e) {
-                e.printStackTrace();
+            //TODO: BUFFER_SIZE here is set to 65508, and should be a passover parameter
+            DatagramPacket packet= new DatagramPacket(new byte[65508],65508);
+            while(!mapAllFinished){
+                try {
+                    socket.receive(packet);
+                    byte[] data = packet.getData();
+                    int length = packet.getLength();
+                    InetAddress host = packet.getAddress();
+                    int port = packet.getPort();
+                    //Every time we receive a package we should send a ACK back.
+                    pendingACKMsgs.add(new DatagramPacket(ackMsg, 3, host, port));
+
+                    int msgID = 0;
+                    for (int i = 3; i >= 0; i--) {
+                        msgID = msgID << 8;
+                        msgID += (int) data[i];
+                    }
+
+                    InetSocketAddress source=new InetSocketAddress(host,port);
+                    if (!msgIDs.containsKey(new InetSocketAddress(host,port))) {
+                        msgIDs.put(source, msgID);
+                    } else if (msgID <= msgIDs.get(source)) continue;
+                    else {
+                        msgIDs.put(source, msgID);
+                    }
+                    //So we get a new package here. We should copy them into DoubleBuffer
+
+                    dbcBuf.put(data,0,length);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
+    static class ACKSender extends Thread {
+        DatagramSocket socket;
+
+        public ACKSender(){
+
+        }
+        public void run() {
+            while(true){
+                try{
+                    socket=new DatagramSocket();
+                    break;
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            DatagramPacket tmp = null;
+            while (!Thread.interrupted()) {
+                try {
+                    tmp = pendingACKMsgs.poll();
+                    if (tmp == null) {
+                        Thread.sleep(100);
+                    } else {
+                        socket.send(tmp);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+    static class Flusher extends Thread{
+        int round_robin;
+        ByteCircularBuffer current;
+        @Override
+        public void run(){
+            while(!interrupted()){
+                try {
+                    current=receivers[round_robin].getDbcBuf().getAnother();
+
+                    //TODO : flush procedure
+
+                    round_robin = (round_robin+1)%numOfThreads;
+                    sleep(100);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
+    }
+    /**
+     * Created by haposola on 16-11-6.
+     * Double buffer's idea is rent from Pro. Li.
+     * When one of this two buffers is full, it should REST, and flush data into disk.
+     * And data will be put into the other buffer, which is working
+     *
+     * We leave the flush procedure to another thread.
+     *
+     */
+    static class DoubleByteCircularBuffer {
+        ByteCircularBuffer bone;
+        ByteCircularBuffer btwo;
+        int size;
+        ByteCircularBuffer current;
+        public DoubleByteCircularBuffer(int size){
+            bone=new ByteCircularBuffer(size);
+            btwo=new ByteCircularBuffer(size);
+            current=bone;
+        }
+        public int getSize(){return  size;}
+        public ByteCircularBuffer getCurrent(){return current;}
+        public ByteCircularBuffer getAnother(){return current==bone?  btwo: bone;}
+        public void put(byte[] buf, int off, int len){
+            int free=current.freeBlocks();
+            if(free > len){
+                current.put(buf,off,len);
+            }else{
+                current.put(buf,off,free);
+                switchCurrent();
+                current.put(buf,off+free,len-free);
+            }
+        }
+        void switchCurrent(){
+            current = (current == bone ? btwo : bone);
+        }
+    }
 }

@@ -13,7 +13,7 @@ import org.apache.hadoop.mapreduce.TaskAttemptID;
 import org.apache.hadoop.mapred.JobID;
 import java.io.IOException;
 
-public class NewEventFetcher<K,V> extends Thread {
+public class NewEventFetcher extends Thread {
     private static final long SLEEP_TIME = 1000;
     private static final int MAX_RETRIES = 10;
     private static final int RETRY_PERIOD = 5000;
@@ -27,12 +27,10 @@ public class NewEventFetcher<K,V> extends Thread {
     int totalMaps;
     private volatile boolean stopped = false;
 
-    public NewEventFetcher(JobID jobId,
-                        TaskUmbilicalProtocol umbilical,
-                        int maxEventsToFetch,int totalMaps
-    ) {
+    public NewEventFetcher(JobID jobId,TaskUmbilicalProtocol umbilical,int maxEventsToFetch,int totalMaps) {
         setName("EventFetcher for fetching Map Completion Events");
         setDaemon(true);
+        this.jobId=jobId;
         this.umbilical = umbilical;
         this.maxEventsToFetch = maxEventsToFetch;
         this.totalMaps=totalMaps;
@@ -77,11 +75,9 @@ public class NewEventFetcher<K,V> extends Thread {
                     }
                 }
             }
-        } catch (InterruptedException e) {
-            return;
+        } catch (InterruptedException ignored) {
         } catch (Throwable t) {
             t.printStackTrace();
-            return;
         }
     }
 
@@ -108,14 +104,9 @@ public class NewEventFetcher<K,V> extends Thread {
 
         do {
             MapTaskCompletionEventsUpdate update =
-                    umbilical.getMapCompletionEvents(
-                            jobId,
-                            fromEventIdx,
-                            maxEventsToFetch
-                            );
+                    umbilical.getMapCompletionEvents(jobId,fromEventIdx,maxEventsToFetch);
             events = update.getMapTaskCompletionEvents();
-            LOG.debug("Got " + events.length + " map completion events from " +
-                    fromEventIdx);
+            LOG.debug("Got " + events.length + " map completion events from " +fromEventIdx);
 
             assert !update.shouldReset() : "Unexpected legacy state";
 
@@ -129,7 +120,6 @@ public class NewEventFetcher<K,V> extends Thread {
             // 3. Remove TIPFAILED maps from neededOutputs since we don't need their
             //    outputs at all.
             for (TaskCompletionEvent event : events) {
-
                 if (TaskCompletionEvent.Status.SUCCEEDED == event.getTaskStatus()) {
                     ++numNewMaps;
                 }

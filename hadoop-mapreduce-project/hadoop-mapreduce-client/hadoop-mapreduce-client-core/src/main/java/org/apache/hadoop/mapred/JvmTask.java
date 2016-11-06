@@ -61,10 +61,10 @@ public class JvmTask implements Writable {
     boolean taskComing = in.readBoolean();
     if (taskComing) {
       boolean isMap = in.readBoolean();
+      boolean isNewShuffleImpl=in.readBoolean();
       if (isMap) {
         t = new MapTask();
       } else {
-        boolean isNewShuffleImpl=in.readBoolean();
         if(isNewShuffleImpl){
           t = new NewReduceTask();//TODO: KEYCHANGE
         }else{
