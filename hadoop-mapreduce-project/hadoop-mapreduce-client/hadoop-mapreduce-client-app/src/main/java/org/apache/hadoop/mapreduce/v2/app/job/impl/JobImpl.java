@@ -1635,6 +1635,7 @@ public class JobImpl implements org.apache.hadoop.mapreduce.v2.app.job.Job,
             implements SingleArcTransition<JobImpl, JobEvent> {
 
         private void callReduceTaskDaemon(JobImpl job) {
+            //TODO : Try another way to find the target hosts to start ShuffleReceiver.
             LOG.info("Calling RPC server");
             try {
                 DistributedFileSystem dfs = (DistributedFileSystem) FileSystem.get(job.loadConfFile());

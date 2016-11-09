@@ -152,7 +152,7 @@ public class MapOutputCollectAndPush<K, V>
                     //String bufID=mapID;
                     //System.arraycopy(bufID.getBytes(),0,b,4,bufID.length());
                     buffer.get(b, 4, tail, head);
-
+                    //TODO : FATAL, wrong way to decide TargetReduceHosts.
                     DatagramPacket dp = new DatagramPacket(b, len + 4, reduceHosts[tempCB.partition], 20016);
                     boolean  retransitionNeeded = true;
                     do {
